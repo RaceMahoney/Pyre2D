@@ -14,6 +14,14 @@ public class RecordInputs : MonoBehaviour{
     private float inputY;
     private string directionVal;
 
+    //the 5 variables to be written to the file and their default values
+    private float X = 0f;
+    private float Y = 0f;
+    private string JUMP = "_";
+    private string DASH = "_";
+    private string ATTACK = "_"; 
+
+
     private void Start()
     {
         Platformer2DUserControl controller = GetComponent<Platformer2DUserControl>();
@@ -27,9 +35,13 @@ public class RecordInputs : MonoBehaviour{
 
     private void Update()
     {
-       
-        //get direction input and save x and y values as a float
-        Vector2 directionalInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));     
+        //reset the bools
+            JUMP = "_";
+            DASH = "_";
+            ATTACK = "_";
+
+    //get direction input and save x and y values as a float
+    Vector2 directionalInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));     
         inputX = directionalInput.x;
         inputY = directionalInput.y;
 
@@ -40,52 +52,64 @@ public class RecordInputs : MonoBehaviour{
         //if there is no X or Y direction then write o
         if(inputX == 0 && inputY == 0)
         {
-            WriteString("0");
+            //reset variables back to default
+            X = 0f;
+            Y = 0f;
         }
      
         //if the player moves left or right
         if(inputX > 0 ||inputX < 0)
         {
-            //conver float to string and write to file
-            directionVal = inputX.ToString();
-            WriteString("X." + directionVal);
+            //save the current player's x-axis speed in X;
+            X = inputX;
         }
 
         //if the player moves up or down
         if (inputY > 0 || inputY < 0)
         {
-            //conver float to strinf and write to file
-            directionVal = inputY.ToString();
-            WriteString("Y." + directionVal);
+            //save the current player's y-axis speed in Y;
+            Y = inputY;
         }
         
 
         //check if normal for double jump
         if (CrossPlatformInputManager.GetButtonDown("Jump"))
         {
-            WriteString("Jump");
+            //record that jump was pressed this frame
+            JUMP = "Jump";
         }
 
-        if (CrossPlatformInputManager.GetButtonUp("Dash"))
+        //TODO make a dash start and dash end
+        if (CrossPlatformInputManager.GetButtonDown("Dash"))
         {
-            WriteString("Dash");
+            //record that dash was pressed this frame
+            DASH = "Dash";
         }
-        if (CrossPlatformInputManager.GetButtonUp("FireAttack"))
+        if (CrossPlatformInputManager.GetButtonDown("FireAttack"))
         {
-            WriteString("Attack");
+            //record that attack was pressed this frame
+            ATTACK = "Attack";
         }
 
-
+        //write the current values at the end of every frame
+        WriteString(X, Y, JUMP, DASH, ATTACK);
 
     }
 
-    static void WriteString(string input)
+    static void WriteString(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack)
     {
+        //combine all values for this frame into one string
+        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack;
         //create writer object & write to file
         string file = "Assets/MyScripts/inputSequence.txt";
         StreamWriter writer = new StreamWriter(file, true);
-        writer.WriteLine(input);
+        writer.WriteLine(input + "\t\t\t\tRECORDED AT FRAME:" + Time.frameCount);
         writer.Close();
+
+    }
+
+    static void Reset()
+    {
 
     }
 
