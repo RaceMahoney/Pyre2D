@@ -1,0 +1,11 @@
+*.png
+Assets/Demons_Pack/
+Assets/Fire Hero 1/
+Assets/Pack/
+*.physicsMaterial2D
+Assets/Standard Assets/
+Library/
+Assets/Sprites/
+Assets/New Physics Material 2D.physicsMaterial2D.meta
+Assets/MovingPlatform Material.physicsMaterial2D.meta
+*.meta
