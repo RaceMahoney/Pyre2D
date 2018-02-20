@@ -11,3 +11,8 @@ Assets/MovingPlatform Material.physicsMaterial2D.meta
 *.meta
 Temp/
 .vs/
+Assets/Firebase/
+Assets/Plugins/x86_64/Firebase/App.bundle
+Assets/Plugins/
+Assets/PlayServicesResolver/
+Assets/Parse/

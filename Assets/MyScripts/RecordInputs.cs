@@ -19,7 +19,9 @@ public class RecordInputs : MonoBehaviour{
     private float Y = 0f;
     private string JUMP = "_";
     private string DASH = "_";
-    private string ATTACK = "_"; 
+    private string ATTACK = "_";
+
+    public int timebetween = 300; //milliseconds
 
 
     private void Start()
@@ -31,7 +33,15 @@ public class RecordInputs : MonoBehaviour{
         //the file is saved unquiely
         File.Delete("Assets/MyScripts/inputSequence.txt");
        
+   
     }
+
+    //private void Update()
+    //{
+    //    GetPlayerInput();
+    //    //TODO make a CheckCollison() for the player
+        
+    //}
 
     private void Update()
     {
@@ -99,7 +109,7 @@ public class RecordInputs : MonoBehaviour{
     static void WriteString(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack)
     {
         //combine all values for this frame into one string
-        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack;
+        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + Time.deltaTime +",";
         //create writer object & write to file
         string file = "Assets/MyScripts/inputSequence.txt";
         StreamWriter writer = new StreamWriter(file, true);

@@ -4,7 +4,7 @@ using System.Threading;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets._2D;
-
+using System.Collections;
 
 [RequireComponent(typeof(PlatformerCharacter2D))]
 public class Platformer2DUserControl : MonoBehaviour
@@ -19,12 +19,15 @@ public class Platformer2DUserControl : MonoBehaviour
     [HideInInspector]
     public bool m_Attack;
 
+    private float h;
     private long pressTime = 0;
     private long coolTime = 0;
     private bool dashReady = true;
     private float temp = 0f;
     Stopwatch stopWatch = new Stopwatch();
     Stopwatch coolDown = new Stopwatch();
+
+  
 
 
     private void Awake()
@@ -38,6 +41,8 @@ public class Platformer2DUserControl : MonoBehaviour
     {
         if (m_Character.validInput)
         {
+            //get the current float X value
+            h = CrossPlatformInputManager.GetAxis("Horizontal");
 
             if (!m_Jump)
             {
@@ -86,21 +91,19 @@ public class Platformer2DUserControl : MonoBehaviour
 
     private void FixedUpdate()
     {
+
         if (m_Character.validInput)
         {
             // Read the inputs.
             bool crouch = Input.GetKey(KeyCode.LeftControl);
-            //TODO make speed more uniform so it is easier to replicate
-            float h = CrossPlatformInputManager.GetAxis("Horizontal");
             // Pass all parameters to the character control script.
             m_Character.Move(h, crouch, m_Jump, m_Dash);
             //UnityEngine.Debug.Log("Speed it: " + h);
-            
+
             m_Jump = false;
             m_Dash = false;
 
         }
-
     }
 }
 

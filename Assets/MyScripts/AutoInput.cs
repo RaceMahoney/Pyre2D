@@ -31,36 +31,48 @@ public class AutoInput : MonoBehaviour {
     private string JUMP = "_";
     private string DASH = "_";
     private string ATTACK = "_";
+    private float TIME = 0f;
 
     //delemeter
     private char del = ',';
 
-
     private static List<string> input_list;
 
     public Collider2D attackTrigger;
-    
-    private void Start()
+
+    private void Awake()
     {
+
         player = GetComponent<PlatformerCharacter2D>();
         m_Anim = gameObject.GetComponent<Animator>();
+    }
+
+    private void Start()
+    {   
         attackTrigger.enabled = false;
         input_list = new List<string>();
         ReadString();
-        
+        Time.maximumDeltaTime = TIME; //Set the first frame delta time
+    }
+   
+
+    private void Update()
+    {
+        GetPlayerInput(index);
+        Time.maximumDeltaTime = TIME; //update the max time with each new frame
+        UpdateAt();
+        index++;
     }
 
-    private void FixedUpdate()
+    private void GetPlayerInput(int index)
     {
-
-        //TODO: is off by an average if 14 frames, need to find solution
         try
         {
             //get the current variable values from the string item in the list based on frame count
             //break that string into its appropriate variables to replicate
             //every frame value from the human player
             string line = input_list[index];
-            string[] values = line.Split(new Char[] { ',', ',', ',', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] values = line.Split(new Char[] { ',', ',', ',', ',',',' }, StringSplitOptions.RemoveEmptyEntries);
 
             //save current values to variables to check this frame
             X = float.Parse(values[0]);
@@ -68,9 +80,9 @@ public class AutoInput : MonoBehaviour {
             JUMP = values[2];
             DASH = values[3];
             ATTACK = values[4];
+            TIME = float.Parse(values[5]);
 
-            //check each frame with the current line to know
-            //what to do that frame
+            //Debug.Log("X value is " + X + " and TIME value is " + TIME);
 
 
             //check for jump and set m_Jump in Platformer2DUserController to true
@@ -106,9 +118,10 @@ public class AutoInput : MonoBehaviour {
                     attackTrigger.enabled = false;
                 }
             }
+
+            //since frames will continue after file has ended,
+            //out of range exception will occur until game terminates
         }
-        //since frames will continue after file has ended,
-        //out of range exception will occur until game terminates
         catch (ArgumentOutOfRangeException e)
         {
             Application.Quit();
@@ -116,25 +129,19 @@ public class AutoInput : MonoBehaviour {
             // Set IndexOutOfRangeException to the new exception's InnerException.
             throw new System.ArgumentOutOfRangeException("index parameter is out of range.", e);
         }
-        
- 
-        //TODO remove all trace of crouch option from code
-        bool crouch = false;
+}
 
-        player.Move(X, crouch, m_Jump, m_Dash);
-        m_Jump = false;
-        m_Dash = false;
 
-        //stop the index from incremdening if there is no more 
-        //item in the list
-        //TODO make game stop when there are no more inputs
-        if (index == input_list.Count)
-        {
-            Application.Quit();
-        }
-
-        index++;
-                
+    private void UpdateAt()
+    {
+            //TODO remove all trace of crouch option from code
+            bool crouch = false;
+            
+            player.Move(X, crouch, m_Jump, m_Dash);
+            m_Jump = false;
+            m_Dash = false;
+        Debug();
+      
     }
     
 
@@ -149,6 +156,19 @@ public class AutoInput : MonoBehaviour {
                 
         }
         reader.Close();
+    }
+
+    private void GetInitalTime()
+    {
+        string line = input_list[index];
+        string[] values = line.Split(new Char[] { ',', ',', ',', ',', ',' }, StringSplitOptions.RemoveEmptyEntries);
+        TIME = float.Parse(values[5]);
+    }
+
+    private void Debug()
+    {
+        //are the current values the what they should be?
+
     }
 
 }
