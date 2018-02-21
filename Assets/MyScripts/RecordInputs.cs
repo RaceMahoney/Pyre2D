@@ -32,16 +32,8 @@ public class RecordInputs : MonoBehaviour{
         //Idea: have the player tester enter their name so that 
         //the file is saved unquiely
         File.Delete("Assets/MyScripts/inputSequence.txt");
-       
-   
+      
     }
-
-    //private void Update()
-    //{
-    //    GetPlayerInput();
-    //    //TODO make a CheckCollison() for the player
-        
-    //}
 
     private void Update()
     {
@@ -101,9 +93,14 @@ public class RecordInputs : MonoBehaviour{
             ATTACK = "Attack";
         }
 
-        //write the current values at the end of every frame
-        WriteString(X, Y, JUMP, DASH, ATTACK);
+    }
 
+    private void FixedUpdate()
+    {
+        //write the current values at the end of every frame
+        //if there has been a change
+        if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
+            WriteString(X, Y, JUMP, DASH, ATTACK);
     }
 
     static void WriteString(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack)

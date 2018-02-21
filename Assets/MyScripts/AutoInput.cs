@@ -132,7 +132,7 @@ public class AutoInput : MonoBehaviour {
 }
 
 
-    private void UpdateAt()
+    private void FixedUpdate()
     {
             //TODO remove all trace of crouch option from code
             bool crouch = false;
@@ -140,7 +140,6 @@ public class AutoInput : MonoBehaviour {
             player.Move(X, crouch, m_Jump, m_Dash);
             m_Jump = false;
             m_Dash = false;
-        Debug();
       
     }
     
