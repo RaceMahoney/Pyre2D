@@ -60,7 +60,6 @@ public class AutoInput : MonoBehaviour {
     {
         GetPlayerInput(index);
         Time.maximumDeltaTime = TIME; //update the max time with each new frame
-        UpdateAt();
         index++;
     }
 
