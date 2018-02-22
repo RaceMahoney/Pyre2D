@@ -9,6 +9,7 @@ using UnityStandardAssets.CrossPlatformInput;
 public class RecordInputs : MonoBehaviour{
 
     private Platformer2DUserControl controller;
+    private PlatformerCharacter2D character;
 
     private float inputX;
     private float inputY;
@@ -27,6 +28,7 @@ public class RecordInputs : MonoBehaviour{
     private void Start()
     {
         Platformer2DUserControl controller = GetComponent<Platformer2DUserControl>();
+        PlatformerCharacter2D character = GetComponent<PlatformerCharacter2D>();
         //clear the file
         //TODO find a better solution instead of deleting the file
         //Idea: have the player tester enter their name so that 
@@ -38,29 +40,30 @@ public class RecordInputs : MonoBehaviour{
     private void Update()
     {
         //reset the bools
-            JUMP = "_";
-            DASH = "_";
-            ATTACK = "_";
+        JUMP = "_";
+        DASH = "_";
+        ATTACK = "_";
 
-    //get direction input and save x and y values as a float
-    Vector2 directionalInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));     
+        //get direction input and save x and y values as a float
+        Vector2 directionalInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         inputX = directionalInput.x;
+        //TODO: Get Y Velocity to write to file
         inputY = directionalInput.y;
 
-       // Debug.Log("Recorded input x " + inputX);
+        // Debug.Log("Recorded input x " + inputX);
         //Debug.Log("Recorded input y " + inputY);
 
-        
+
         //if there is no X or Y direction then write o
-        if(inputX == 0 && inputY == 0)
+        if (inputX == 0 && inputY == 0)
         {
             //reset variables back to default
             X = 0f;
             Y = 0f;
         }
-     
+
         //if the player moves left or right
-        if(inputX > 0 ||inputX < 0)
+        if (inputX > 0 || inputX < 0)
         {
             //save the current player's x-axis speed in X;
             X = inputX;
@@ -72,7 +75,7 @@ public class RecordInputs : MonoBehaviour{
             //save the current player's y-axis speed in Y;
             Y = inputY;
         }
-        
+
 
         //check if normal for double jump
         if (CrossPlatformInputManager.GetButtonDown("Jump"))
@@ -93,15 +96,16 @@ public class RecordInputs : MonoBehaviour{
             ATTACK = "Attack";
         }
 
-    }
 
-    private void FixedUpdate()
-    {
+
+
         //write the current values at the end of every frame
         //if there has been a change
-        if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
-            WriteString(X, Y, JUMP, DASH, ATTACK);
+        //if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
+        WriteString(X, Y, JUMP, DASH, ATTACK);
+
     }
+    
 
     static void WriteString(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack)
     {

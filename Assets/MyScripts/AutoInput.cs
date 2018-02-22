@@ -52,14 +52,16 @@ public class AutoInput : MonoBehaviour {
         attackTrigger.enabled = false;
         input_list = new List<string>();
         ReadString();
-        Time.maximumDeltaTime = TIME; //Set the first frame delta time
+        //GetInitalTime();
+        //Time.maximumDeltaTime = TIME; //Set the first frame delta time
     }
    
 
     private void Update()
     {
+        
         GetPlayerInput(index);
-        Time.maximumDeltaTime = TIME; //update the max time with each new frame
+        Time.fixedDeltaTime = TIME; //update the max time with each new frame
         index++;
     }
 
@@ -135,7 +137,7 @@ public class AutoInput : MonoBehaviour {
     {
             //TODO remove all trace of crouch option from code
             bool crouch = false;
-            
+             // UnityEngine.Debug.Log("DELTA TIME IS: " + Time.deltaTime + "ON FRAME: " + Time.frameCount);
             player.Move(X, crouch, m_Jump, m_Dash);
             m_Jump = false;
             m_Dash = false;

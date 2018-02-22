@@ -6,9 +6,9 @@ using UnityEngine;
     public class PlatformerCharacter2D : MonoBehaviour
     {
         [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
-        [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
-        // [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
-        [SerializeField] private bool m_AirControl = false;                 // Whether or not a player can steer while jumping;
+        [SerializeField] private float m_JumpForce = 12f;                  // Amount of force added when the player jumps.
+        [SerializeField] private float m_DashSpeed = 10f;
+        [SerializeField] private bool m_AirControl = true;                 // Whether or not a player can steer while jumping;
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
@@ -40,6 +40,8 @@ using UnityEngine;
 
             //Set max health to 
             health = MAX_HEALTH;
+
+     
         }
 
 
@@ -69,7 +71,7 @@ using UnityEngine;
                 m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
                 validInput = false;
                 Application.LoadLevel(Application.loadedLevel);
-        }
+            }
 
 
         }
@@ -110,7 +112,9 @@ using UnityEngine;
                 // Add a vertical force to the player.
                 m_Grounded = false;
                 m_Anim.SetBool("Ground", false);
-                m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                m_Rigidbody2D.velocity = new Vector2(0f, m_JumpForce);
+                
+            
                 
             }
 
@@ -122,11 +126,11 @@ using UnityEngine;
                 
                 if (m_FacingRight)
                 {
-                    m_Rigidbody2D.AddForce(new Vector2(2200f, 0f));            
+                    m_Rigidbody2D.velocity = new Vector2(m_DashSpeed, 0f);  
                 }
                 if (!m_FacingRight)
                 {
-                    m_Rigidbody2D.AddForce(new Vector2(-2200f, 0f));
+                    m_Rigidbody2D.velocity = new Vector2(-m_DashSpeed, 0f);
                 }
                 
 
@@ -162,6 +166,17 @@ using UnityEngine;
             //player has been hit by an enemy
             health -= dmg;
             gameObject.GetComponent<Animation>().Play("FireHeroHurt");
+        }
+
+        public void SetVelocityY(float Y)
+        {
+            m_Rigidbody2D.velocity = new Vector2(0f, Y);
+        }
+
+        public float GetVelocityY()
+        {
+            float velY = m_Rigidbody2D.velocity.y;
+            return velY;
         }
 
         

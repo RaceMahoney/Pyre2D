@@ -34,6 +34,7 @@ public class Platformer2DUserControl : MonoBehaviour
     {
         m_Character = GetComponent<PlatformerCharacter2D>();
         playerAttack = GetComponent<PlayerAttack>();
+       
     }
 
 
