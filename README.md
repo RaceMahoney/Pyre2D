@@ -1,7 +1,9 @@
 # Pyre2D
 A two-dimensinal platfromer in Unity 2017 to be used as a testing environment for my senior research project. The project aims to determine if using capture replay and image difference can accurately detect software bugs for games in regression testing. 
 
-![alt tag](.../master/Docs/images/Capture1.png)
+<img src="https://github.com/RaceMahoney/Pyre2D/blob/master/Docs/images/Capture2.PNG" alt="text" width="300" heigth="200">              <img src="https://github.com/RaceMahoney/Pyre2D/blob/master/Docs/images/Capture1.PNG" alt="text" width="300" heigth="200">
+
+
 
 ## Implementation 
 For my experiment, I created this game taking heavy inspiration from my favorite indie game and Kickstarter project, "Shovel Knight". For the purpose of testing I made the first level an almost exact replica of the first stage in "Shovel Knight". The unnamed protagonist is able to jump, dash and attack with a sword of fire. While playing, all inputs and important values will be recorded to a file to be used later for replay. Along with the input recording, periodically throughout the game, screenshots will be automatically taken and send to Google's Firebase cloud database. 
