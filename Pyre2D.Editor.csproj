@@ -357,6 +357,7 @@
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
     <None Include="Assets\MyScripts\inputSequence.txt" />
+    <None Include="Assets\MyScripts\positions.txt.txt" />
     <None Include="Assets\PlayServicesResolver\Editor\play-services-resolver_v1.2.61.0.txt" />
     <None Include="Assets\Plugins\Android\Firebase\AndroidManifest.xml" />
     <None Include="Assets\Sprites\Spritesheet\blueSheet.xml" />

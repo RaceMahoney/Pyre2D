@@ -73,15 +73,16 @@ using UnityEngine;
                 Application.LoadLevel(Application.loadedLevel);
             }
 
+        
 
         }
 
 
         public void Move(float move, bool crouch, bool jump, bool dash)
         {
-
-            //only control the player if grounded or airControl is turned on
-            if (m_Grounded || m_AirControl)
+        
+        //only control the player if grounded or airControl is turned on
+        if (m_Grounded || m_AirControl)
             {
 
                 // The Speed animator parameter is set to the absolute value of the horizontal input.

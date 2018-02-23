@@ -54,7 +54,12 @@ namespace UnityStandardAssets.CrossPlatformInput
 			return activeInput.ButtonExists(name);
 		}
 
-		public static void RegisterVirtualAxis(VirtualAxis axis)
+        public static bool GetButtonDown(KeyCode d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void RegisterVirtualAxis(VirtualAxis axis)
 		{
 			activeInput.RegisterVirtualAxis(axis);
 		}

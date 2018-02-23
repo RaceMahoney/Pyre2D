@@ -32,6 +32,8 @@ public class AutoInput : MonoBehaviour {
     private string DASH = "_";
     private string ATTACK = "_";
     private float TIME = 0f;
+    private float XPos = 0f;
+    private float YPos = 0f;
 
     //delemeter
     private char del = ',';
@@ -48,7 +50,7 @@ public class AutoInput : MonoBehaviour {
     }
 
     private void Start()
-    {   
+    {
         attackTrigger.enabled = false;
         input_list = new List<string>();
         ReadString();
@@ -59,7 +61,6 @@ public class AutoInput : MonoBehaviour {
 
     private void Update()
     {
-        
         GetPlayerInput(index);
         Time.fixedDeltaTime = TIME; //update the max time with each new frame
         index++;
@@ -73,7 +74,7 @@ public class AutoInput : MonoBehaviour {
             //break that string into its appropriate variables to replicate
             //every frame value from the human player
             string line = input_list[index];
-            string[] values = line.Split(new Char[] { ',', ',', ',', ',',',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] values = line.Split(new Char[] { ',', ',', ',', ',' , ',' , ',' , ',' , ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             //save current values to variables to check this frame
             X = float.Parse(values[0]);
@@ -82,6 +83,8 @@ public class AutoInput : MonoBehaviour {
             DASH = values[3];
             ATTACK = values[4];
             TIME = float.Parse(values[5]);
+            XPos = float.Parse(values[6]);
+            YPos = float.Parse(values[7]);
 
             //Debug.Log("X value is " + X + " and TIME value is " + TIME);
 
@@ -118,6 +121,13 @@ public class AutoInput : MonoBehaviour {
                     attacking = false;
                     attackTrigger.enabled = false;
                 }
+            }
+
+            //check if XPos and YPos are NOT ZERO
+            //if so, make a correction
+            if(XPos != 0 || YPos != 0)
+            {
+                Correction();
             }
 
             //since frames will continue after file has ended,
@@ -158,17 +168,11 @@ public class AutoInput : MonoBehaviour {
         reader.Close();
     }
 
-    private void GetInitalTime()
+    private void Correction()
     {
-        string line = input_list[index];
-        string[] values = line.Split(new Char[] { ',', ',', ',', ',', ',' }, StringSplitOptions.RemoveEmptyEntries);
-        TIME = float.Parse(values[5]);
-    }
-
-    private void Debug()
-    {
-        //are the current values the what they should be?
-
+        //set X and Y position
+        transform.position = new Vector2(XPos,YPos);
+        Debug.Log("UPDATED THE TRANSFORM!!");
     }
 
 }

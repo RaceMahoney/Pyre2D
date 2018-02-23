@@ -22,8 +22,12 @@ public class RecordInputs : MonoBehaviour{
     private string DASH = "_";
     private string ATTACK = "_";
 
-    public int timebetween = 300; //milliseconds
+    //X and Y position of the player
+    private float Xpos = 0f;
+    private float Ypos = 0f;
 
+    private double nextActionTime = 0.0;
+    public double peroid = 0.4;
 
     private void Start()
     {
@@ -34,7 +38,6 @@ public class RecordInputs : MonoBehaviour{
         //Idea: have the player tester enter their name so that 
         //the file is saved unquiely
         File.Delete("Assets/MyScripts/inputSequence.txt");
-      
     }
 
     private void Update()
@@ -44,6 +47,11 @@ public class RecordInputs : MonoBehaviour{
         DASH = "_";
         ATTACK = "_";
 
+        //reset the Pos
+        Xpos = 0f;
+        Ypos = 0f;
+
+        
         //get direction input and save x and y values as a float
         Vector2 directionalInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         inputX = directionalInput.x;
@@ -96,32 +104,43 @@ public class RecordInputs : MonoBehaviour{
             ATTACK = "Attack";
         }
 
-
-
+        //if 5 seconds have passed
+        //then get the current player position and write it to a file
+        if(Time.time > nextActionTime)
+        {
+            nextActionTime += peroid;
+            GetPlayerPos();
+        }
 
         //write the current values at the end of every frame
         //if there has been a change
         //if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
-        WriteString(X, Y, JUMP, DASH, ATTACK);
+        WriteInputs(X, Y, JUMP, DASH, ATTACK, Xpos, Ypos);
 
     }
-    
 
-    static void WriteString(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack)
+    void GetPlayerPos()
     {
+        Xpos = transform.position.x;
+        Ypos = transform.position.y;
+
+    }
+
+    static void WriteInputs(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack, double w_XPos, double w_YPos)
+    {
+        int frames = Time.frameCount;
+        frames--;//adjust for list starting at 0
         //combine all values for this frame into one string
-        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + Time.deltaTime +",";
+        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + Time.deltaTime +"," + w_XPos + "," + w_YPos + ",";
         //create writer object & write to file
         string file = "Assets/MyScripts/inputSequence.txt";
         StreamWriter writer = new StreamWriter(file, true);
-        writer.WriteLine(input + "\t\t\t\tRECORDED AT FRAME:" + Time.frameCount);
+        writer.WriteLine(input + "\t\t\t\tRECORDED AT FRAME:" + frames);
         writer.Close();
 
     }
 
-    static void Reset()
-    {
+    
 
-    }
 
 }

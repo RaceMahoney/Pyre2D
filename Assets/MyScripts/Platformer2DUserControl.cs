@@ -19,7 +19,7 @@ public class Platformer2DUserControl : MonoBehaviour
     [HideInInspector]
     public bool m_Attack;
 
-    private float h;
+    private float h = 0f;
     private long pressTime = 0;
     private long coolTime = 0;
     private bool dashReady = true;
