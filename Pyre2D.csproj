@@ -351,6 +351,7 @@
     <Compile Include="Assets\MyScripts\HorizontalMovingPlatform.cs" />
     <Compile Include="Assets\MyScripts\HUD.cs" />
     <Compile Include="Assets\MyScripts\LadderController.cs" />
+    <Compile Include="Assets\MyScripts\MemStream.cs" />
     <Compile Include="Assets\MyScripts\MovingPlatform.cs" />
     <Compile Include="Assets\MyScripts\PauseMenu.cs" />
     <Compile Include="Assets\MyScripts\Platformer2DUserControl.cs" />
@@ -362,6 +363,7 @@
     <Compile Include="Assets\MyScripts\SpringBounce.cs" />
     <Compile Include="Assets\MyScripts\UploadFiles.cs" />
     <Compile Include="Assets\MyScripts\VerticalMovingPlatform.cs" />
+    <Compile Include="Assets\SrirachaHealth.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Demons_Pack\Contact_Info.txt" />

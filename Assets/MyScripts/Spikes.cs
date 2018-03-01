@@ -4,14 +4,26 @@ using UnityEngine;
 
 public class Spikes : MonoBehaviour {
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.gameObject.tag == "Player") ;
-        {
-            Debug.Log("Dead");
-            Application.Quit();
-            //TODO death animation, SFX, and death screen
-        }
+    private PlatformerCharacter2D player;
 
+    // Use this for initialization
+    void Start()
+    {
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+
+        if (other.gameObject.tag == "Player")
+        {
+            player = other.GetComponent<PlatformerCharacter2D>();
+            if (player != null)
+            {
+                player.health = 0;
+                //TODO play death animation and sound
+            }
+
+        }
     }
 }

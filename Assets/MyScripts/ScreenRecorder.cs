@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -39,13 +40,27 @@ public class ScreenRecorder : MonoBehaviour
     private bool captureScreenshot = false;
     private bool captureVideo = false;
 
-    public Checkpoint[] checkpoints;
+    public GameObject[] checkpoints;
     private bool trigger;
+
+    private string destinationDrive;
+    private string dataPath = @"";
 
     void Start()
     {
         checkpointTrigger = GetComponent<Checkpoint>();
-        
+
+        //find the correct destination drive
+        string[] drives = Directory.GetLogicalDrives();
+        foreach (string drive in drives)
+        {
+            if (drive == @"F:\") //need to replace with whatever the USB drive name is
+            {
+                destinationDrive = drive;
+            }
+        }
+
+        folder = destinationDrive;
     }
 
 
@@ -53,9 +68,9 @@ public class ScreenRecorder : MonoBehaviour
     private string uniqueFilename(int width, int height)
     {
         // if folder not specified by now use a good default
-        if (folder == @"D:\UnityProjects\Platformer\Sceenshots" || folder.Length == 0)
+        if (folder == destinationDrive || folder.Length == 0)
         {
-            folder = Application.dataPath;
+            //folder = Application.persistentDataPath;
             if (Application.isEditor)
             {
                 // put screenshots in folder above asset path so unity doesn't index the files
@@ -68,12 +83,12 @@ public class ScreenRecorder : MonoBehaviour
             System.IO.Directory.CreateDirectory(folder);
 
             // count number of files of specified format in folder
-            string mask = string.Format("screen_{0}x{1}*.{2}", width, height, format.ToString().ToLower());
+            string mask = string.Format("checkpoint_{0}x{1}*.{2}", width, height, format.ToString().ToLower());
             counter = Directory.GetFiles(folder, mask, SearchOption.TopDirectoryOnly).Length;
         }
 
         // use width, height, and counter for unique file name
-        var filename = string.Format("{0}/screen_{1}x{2}_{3}.{4}", folder, width, height, counter, format.ToString().ToLower());
+        var filename = string.Format("{0}/checkpoint_{1}x{2}_{3}.{4}", folder, width, height, counter, format.ToString().ToLower());
 
         // up counter for next call
         ++counter;
@@ -89,21 +104,48 @@ public class ScreenRecorder : MonoBehaviour
 
     void Update()
     {
-        foreach (Checkpoint check in checkpoints)
+        try
         {
-            trigger = check.getBool();
-            if (trigger)
+            foreach (GameObject check in checkpoints)
             {
-                captureScreenshot = true;
+                //calculate distance of that checkpoint
+                float dist = Vector3.Distance(transform.position, check.transform.position);
+
+                //if the player gets close enought to the trigger
+                //turn it on and get it ready
+                if (dist < 20)
+                {
+                    check.SetActive(true);
+                    //determine if the player has entered the collider
+                    Checkpoint checkScript = check.GetComponent<Checkpoint>();
+                    trigger = checkScript.getBool();
+                    
+                    if (trigger)
+                    {
+                        captureScreenshot = true;
+                    } else
+                    {
+                        captureScreenshot = false;
+                    }
+                }
+                else
+                {
+                    check.SetActive(false);
+                }
+
             }
+        }catch (NullReferenceException e)
+        {
+            //gameobject was not there
         }
-        //Debug.Log(captureScreenshot);
-        // check keyboard 'k' for one time screenshot capture and holding down 'v' for continious screenshots
-        //captureScreenshot |= Input.GetKey("k");
-        captureVideo = Input.GetKey("v");
+           
+            // check keyboard 'k' for one time screenshot capture and holding down 'v' for continious screenshots
+            //captureScreenshot |= Input.GetKey("k");
+            captureVideo = Input.GetKey("v");
 
         if (captureScreenshot || captureVideo)
         {
+            Debug.Log("Screen shot was taken");
             captureScreenshot = false;
 
             // hide optional game object if set

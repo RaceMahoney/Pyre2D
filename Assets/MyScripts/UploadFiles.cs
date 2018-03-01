@@ -1,45 +1,49 @@
 ﻿using Firebase.Storage;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-
+using UnityEditor;
 
 public class UploadFiles : MonoBehaviour {
 
-    private void Start()
+    private string destinationDrive;
+    private string dataPath = @"";
+    private string inputSeq = "inputSequence.txt";
+
+    private void OnApplicationQuit()
     {
-        // File located on disk
-        string local_file = @"D:\UnityProjects\Platformer\Pyre2D\Checkpoint0.png";
-
-    // Get a reference to the storage service, using the default Firebase App
-    FirebaseStorage storage = FirebaseStorage.DefaultInstance;
-
-    // Create a storage reference from our storage service
-     StorageReference storage_ref = storage.GetReferenceFromUrl("gs://compscreenshottest.appspot.com/");
-
-    // Create a reference to the file you want to upload
-     StorageReference screenshot_ref = storage_ref.Child("screenshots/checkpoint0.png");
-
-        Debug.Log("Start ran. Refreneces made");
-        // Upload the file to the path "images/rivers.jpg"
-        screenshot_ref.PutFileAsync(local_file).ContinueWith((Task<StorageMetadata> task) => {
-            if (task.IsFaulted || task.IsCanceled)
+        //find the correct destination drive
+        string[] drives = Directory.GetLogicalDrives();
+        foreach (string drive in drives)
+        {
+            if (drive == @"F:\")
             {
-                Debug.Log(task.Exception.ToString());
-                // Uh-oh, an error occurred!
+                destinationDrive = drive;
+                Debug.Log("Found " + drive);
             }
-            else
-            {
-                // Metadata contains file metadata such as size, content-type, and download URL.
-                StorageMetadata metadata = task.Result;
-                string download_url = metadata.DownloadUrl.ToString();
-                Debug.Log("Finished uploading...");
-                Debug.Log("download url = " + download_url);
-            }
-        });
+        }
+
+        string inputPath = "D:\\UnityProjects\\Platformer\\Pyre2D\\Assets\\MyScripts\\";
+        inputPath = Path.GetFullPath(inputPath);
+        inputPath = Path.Combine(inputPath, inputSeq);
+
+
+        if (File.Exists(inputPath))
+        {
+            Debug.Log("You fucking found it");
+        } else
+        {
+            Debug.Log("back to the drawinf board fuck nugget");
+        }
+           
+        destinationDrive += inputSeq;
+
+        FileUtil.CopyFileOrDirectory(inputPath, destinationDrive);
+
     }
 
-
-
 }
+
+

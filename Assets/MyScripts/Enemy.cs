@@ -50,7 +50,7 @@ public class Enemy : MonoBehaviour {
         if (collision.CompareTag("Player"))
         {
             m_Character.Damage(1);
-            StartCoroutine(m_Character.Knockback(0.02f, 350, transform.position));
+            //StartCoroutine(m_Character.Knockback(0.02f, 350, transform.position));
         }
     }
 

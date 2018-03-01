@@ -28,8 +28,12 @@ using UnityEngine;
         [HideInInspector]
         public int health;
 
+        
 
-        private void Awake()
+
+
+
+    private void Awake()
         {
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
@@ -73,9 +77,10 @@ using UnityEngine;
                 Application.LoadLevel(Application.loadedLevel);
             }
 
-        
+      
 
-        }
+
+    }
 
 
         public void Move(float move, bool crouch, bool jump, bool dash)
@@ -178,6 +183,12 @@ using UnityEngine;
         {
             float velY = m_Rigidbody2D.velocity.y;
             return velY;
+        }
+
+        public void Correction(Vector2 target, float move)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, target, move * Time.deltaTime);
+
         }
 
         

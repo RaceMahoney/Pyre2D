@@ -24,8 +24,10 @@ public class AutoInput : MonoBehaviour {
     private float attackCd = 0.1f;
     private Animator m_Anim;
     public float speed = 0.3f;
+    private double nextActionTime = 0.0;
+    private double peroid = 0.4;
 
-    //the 5 variables to be written to the file and their default values
+    //the 8 variables to be written to the file and their default values
     private float X = 0f;
     private float Y = 0f;
     private string JUMP = "_";
@@ -35,11 +37,9 @@ public class AutoInput : MonoBehaviour {
     private float XPos = 0f;
     private float YPos = 0f;
 
-    //delemeter
-    private char del = ',';
-
-    private static List<string> input_list;
-
+    private char del = ',';         //delimeter
+    private static List<string> input_list; //list of inputs from the file
+    public Vector2 targetPos;
     public Collider2D attackTrigger;
 
     private void Awake()
@@ -86,7 +86,8 @@ public class AutoInput : MonoBehaviour {
             XPos = float.Parse(values[6]);
             YPos = float.Parse(values[7]);
 
-            //Debug.Log("X value is " + X + " and TIME value is " + TIME);
+            //Set Target Position
+            targetPos = new Vector2(XPos, YPos);
 
 
             //check for jump and set m_Jump in Platformer2DUserController to true
@@ -123,12 +124,7 @@ public class AutoInput : MonoBehaviour {
                 }
             }
 
-            //check if XPos and YPos are NOT ZERO
-            //if so, make a correction
-            if(XPos != 0 || YPos != 0)
-            {
-                Correction();
-            }
+           
 
             //since frames will continue after file has ended,
             //out of range exception will occur until game terminates
@@ -149,7 +145,17 @@ public class AutoInput : MonoBehaviour {
             bool crouch = false;
              // UnityEngine.Debug.Log("DELTA TIME IS: " + Time.deltaTime + "ON FRAME: " + Time.frameCount);
             player.Move(X, crouch, m_Jump, m_Dash);
-            m_Jump = false;
+
+        //check if XPos and YPos are NOT ZERO
+        //if so, make a correction
+        if (XPos != 0 || YPos != 0)
+        {
+            player.Correction(targetPos, X);
+            updatePos();
+        }
+
+
+        m_Jump = false;
             m_Dash = false;
       
     }
@@ -168,11 +174,11 @@ public class AutoInput : MonoBehaviour {
         reader.Close();
     }
 
-    private void Correction()
+    private void updatePos()
     {
-        //set X and Y position
-        transform.position = new Vector2(XPos,YPos);
-        Debug.Log("UPDATED THE TRANSFORM!!");
+        //move to correct position  without telemorting
+        transform.position = new Vector2(XPos, YPos);
+        
     }
 
 }

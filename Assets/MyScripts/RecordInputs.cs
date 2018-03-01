@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
@@ -29,6 +31,13 @@ public class RecordInputs : MonoBehaviour{
     private double nextActionTime = 0.0;
     public double peroid = 0.4;
 
+    int count;
+    byte[] byteArray;
+    char[] charArray;
+    UnicodeEncoding uniEncoding = new UnicodeEncoding();
+
+    private string[] line = {" "};
+
     private void Start()
     {
         Platformer2DUserControl controller = GetComponent<Platformer2DUserControl>();
@@ -37,7 +46,8 @@ public class RecordInputs : MonoBehaviour{
         //TODO find a better solution instead of deleting the file
         //Idea: have the player tester enter their name so that 
         //the file is saved unquiely
-        File.Delete("Assets/MyScripts/inputSequence.txt");
+        File.WriteAllLines("Assets/MyScripts/inputSequence.txt", null);
+        //File.Delete("Assets/MyScripts/inputSequence.txt");
     }
 
     private void Update()
@@ -104,7 +114,7 @@ public class RecordInputs : MonoBehaviour{
             ATTACK = "Attack";
         }
 
-        //if 5 seconds have passed
+        //if x seconds have passed
         //then get the current player position and write it to a file
         if(Time.time > nextActionTime)
         {
@@ -116,7 +126,7 @@ public class RecordInputs : MonoBehaviour{
         //if there has been a change
         //if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
         WriteInputs(X, Y, JUMP, DASH, ATTACK, Xpos, Ypos);
-
+ 
     }
 
     void GetPlayerPos()
@@ -126,21 +136,21 @@ public class RecordInputs : MonoBehaviour{
 
     }
 
-    static void WriteInputs(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack, double w_XPos, double w_YPos)
+    void WriteInputs(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack, double w_XPos, double w_YPos)
     {
         int frames = Time.frameCount;
         frames--;//adjust for list starting at 0
         //combine all values for this frame into one string
         string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + Time.deltaTime +"," + w_XPos + "," + w_YPos + ",";
+
+
         //create writer object & write to file
+        //also wirte to file to compare output
         string file = "Assets/MyScripts/inputSequence.txt";
         StreamWriter writer = new StreamWriter(file, true);
         writer.WriteLine(input + "\t\t\t\tRECORDED AT FRAME:" + frames);
         writer.Close();
 
     }
-
-    
-
 
 }
