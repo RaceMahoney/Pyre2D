@@ -10,12 +10,14 @@ using UnityStandardAssets._2D;
 [RequireComponent(typeof(PlatformerCharacter2D))]
 public class AutoInput : MonoBehaviour {
     private PlatformerCharacter2D player;
+    private PauseMenu menu;
 
     private static string input;
     private static string path = "Assets/MyScripts/inputSequence.txt";
     private bool m_Jump;
     private bool m_Dash;
     private bool m_Attack;
+    private bool m_Pause;
     private int index = 0;
     private float xfloat;
     private float yfloat;
@@ -33,6 +35,7 @@ public class AutoInput : MonoBehaviour {
     private string JUMP = "_";
     private string DASH = "_";
     private string ATTACK = "_";
+    private string PAUSE = "_";
     private float TIME = 0f;
     private float XPos = 0f;
     private float YPos = 0f;
@@ -47,6 +50,7 @@ public class AutoInput : MonoBehaviour {
 
         player = GetComponent<PlatformerCharacter2D>();
         m_Anim = gameObject.GetComponent<Animator>();
+        menu = GetComponent<PauseMenu>();
     }
 
     private void Start()
@@ -82,9 +86,10 @@ public class AutoInput : MonoBehaviour {
             JUMP = values[2];
             DASH = values[3];
             ATTACK = values[4];
-            TIME = float.Parse(values[5]);
-            XPos = float.Parse(values[6]);
-            YPos = float.Parse(values[7]);
+            PAUSE = values[5];
+            TIME = float.Parse(values[6]);
+            XPos = float.Parse(values[7]);
+            YPos = float.Parse(values[8]);
 
             //Set Target Position
             targetPos = new Vector2(XPos, YPos);
@@ -101,6 +106,13 @@ public class AutoInput : MonoBehaviour {
             {
                 m_Dash = true;
             }
+
+            //check for pause and set m_Pause in Pausemenu to true
+            //if (PAUSE.Equals("Pause"))
+            //{
+            //    m_Pause = true;
+            //}
+
 
 
             //check for if an attack was used
@@ -141,10 +153,16 @@ public class AutoInput : MonoBehaviour {
 
     private void FixedUpdate()
     {
-            //TODO remove all trace of crouch option from code
-            bool crouch = false;
-             // UnityEngine.Debug.Log("DELTA TIME IS: " + Time.deltaTime + "ON FRAME: " + Time.frameCount);
-            player.Move(X, crouch, m_Jump, m_Dash);
+        //TODO remove all trace of crouch option from code
+        bool crouch = false;
+        
+        //move the player with the correct recored values
+        player.Move(X, crouch, m_Jump, m_Dash);
+
+        //pause or unpause the game
+        //TODO implement the pause into replay
+       // menu.paused = m_Pause;
+
 
         //check if XPos and YPos are NOT ZERO
         //if so, make a correction
@@ -156,7 +174,7 @@ public class AutoInput : MonoBehaviour {
 
 
         m_Jump = false;
-            m_Dash = false;
+        m_Dash = false;
       
     }
     

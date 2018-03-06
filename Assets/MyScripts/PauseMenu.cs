@@ -6,7 +6,7 @@ public class PauseMenu : MonoBehaviour {
 
     public GameObject PauseUI;
 
-    private bool paused = false;
+    public bool paused = false;
 
     void Start()
     {
@@ -43,10 +43,6 @@ public class PauseMenu : MonoBehaviour {
         Application.LoadLevel(Application.loadedLevel);
     }
 
-    public void MainMenu()
-    {
-        //TODO load a main menu eventually
-    }
 
     public void Quit()
     {

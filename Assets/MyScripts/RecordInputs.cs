@@ -24,6 +24,7 @@ public class RecordInputs : MonoBehaviour{
     private string JUMP = "_";
     private string DASH = "_";
     private string ATTACK = "_";
+    private string PAUSE = "_";
 
     //X and Y position of the player
     private float Xpos = 0f;
@@ -48,13 +49,11 @@ public class RecordInputs : MonoBehaviour{
 
         //find the correct destination drive
         string[] drives = Directory.GetLogicalDrives();
-        Debug.Log("Found these drives:");
         foreach (string drive in drives)
         {
             if (drive == @"E:\")
             {
                 destinationDrive = drive;
-                Debug.Log("Found " + drive);
                 destinationDrive += @"\inputSequence.txt";
             }
         }
@@ -67,6 +66,7 @@ public class RecordInputs : MonoBehaviour{
         JUMP = "_";
         DASH = "_";
         ATTACK = "_";
+        PAUSE = "_";
 
         //reset the Pos
         Xpos = 0f;
@@ -124,10 +124,15 @@ public class RecordInputs : MonoBehaviour{
             //record that attack was pressed this frame
             ATTACK = "Attack";
         }
+        if (CrossPlatformInputManager.GetButtonDown("Pause"))
+        {
+            //record the game was paused
+            PAUSE = "Pause";
+        }
 
         //if x seconds have passed
         //then get the current player position and write it to a file
-        if(Time.time > nextActionTime)
+        if (Time.time > nextActionTime)
         {
             nextActionTime += peroid;
             GetPlayerPos();
@@ -136,7 +141,7 @@ public class RecordInputs : MonoBehaviour{
         //write the current values at the end of every frame
         //if there has been a change
         //if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
-        WriteInputs(X, Y, JUMP, DASH, ATTACK, Xpos, Ypos);
+        WriteInputs(X, Y, JUMP, DASH, ATTACK, PAUSE, Xpos, Ypos);
 
         //Debug.Log(destinationDrive);
     }
@@ -148,12 +153,12 @@ public class RecordInputs : MonoBehaviour{
 
     }
 
-    void WriteInputs(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack, double w_XPos, double w_YPos)
+    void WriteInputs(float w_X, float w_Y, string w_Jump, string w_Dash, string w_Attack, string w_Pause, double w_XPos, double w_YPos)
     {
         int frames = Time.frameCount;
         frames--;//adjust for list starting at 0
         //combine all values for this frame into one string
-        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + Time.deltaTime +"," + w_XPos + "," + w_YPos + ",";
+        string input = w_X + "," + w_Y + "," + w_Jump + "," + w_Dash + "," + w_Attack + "," + "w_Pause" + "," + Time.deltaTime +"," + w_XPos + "," + w_YPos + ",";
 
 
         //create writer object & write to file

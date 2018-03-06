@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour {
     public int currentHealth = 20;
     private PlatformerCharacter2D m_Character;
 
+
     // Use this for initialization
     void Start () {
         m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
@@ -20,6 +21,8 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        
 
         if (transform.position.x != Waypoints[CurrentPoint].transform.position.x)
         {
@@ -36,12 +39,12 @@ public class Enemy : MonoBehaviour {
         }
 
         //check current health
-
         if(currentHealth <= 0)
         {
             Destroy(gameObject);
             //TODO death animation
         }
+
 
     }
 
@@ -59,4 +62,6 @@ public class Enemy : MonoBehaviour {
         currentHealth -= damage;
         //gameObject.gameObject<Animation>.Play("EnemyHurt");
     }
+
+    
 }
