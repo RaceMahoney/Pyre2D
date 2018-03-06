@@ -54,7 +54,7 @@ public class ScreenRecorder : MonoBehaviour
         string[] drives = Directory.GetLogicalDrives();
         foreach (string drive in drives)
         {
-            if (drive == @"F:\") //need to replace with whatever the USB drive name is
+            if (drive == @"E:\") //need to replace with whatever the USB drive name is
             {
                 destinationDrive = drive;
             }

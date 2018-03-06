@@ -19,6 +19,10 @@ namespace UnityStandardAssets._2D
 
         private void Start()
         {
+            if (Thanks.enabled)
+            {
+                Thanks.enabled = false;
+            }
             m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
             campfire = GetComponent<Campfires>();
             end = campfire.end;
@@ -27,7 +31,7 @@ namespace UnityStandardAssets._2D
 
         private void Update()
         {
-            end = campfire.end;
+           // end = campfire.end;
             HeartUI.sprite = HeartSrpites[m_Character.health];
             SetText();
 

@@ -15,6 +15,8 @@ public class RecordInputs : MonoBehaviour{
     private float inputX;
     private float inputY;
     private string directionVal;
+    private string destinationDrive;
+    private string file;
 
     //the 5 variables to be written to the file and their default values
     private float X = 0f;
@@ -42,11 +44,21 @@ public class RecordInputs : MonoBehaviour{
         Platformer2DUserControl controller = GetComponent<Platformer2DUserControl>();
         PlatformerCharacter2D character = GetComponent<PlatformerCharacter2D>();
         //clear the file
-        //TODO find a better solution instead of deleting the file
-        //Idea: have the player tester enter their name so that 
-        //the file is saved unquiely
-        File.WriteAllLines("Assets/MyScripts/inputSequence.txt", null);
-        //File.Delete("Assets/MyScripts/inputSequence.txt");
+        File.WriteAllLines("Assets/MyScripts/inputSequence.txt", line);
+
+        //find the correct destination drive
+        string[] drives = Directory.GetLogicalDrives();
+        Debug.Log("Found these drives:");
+        foreach (string drive in drives)
+        {
+            if (drive == @"E:\")
+            {
+                destinationDrive = drive;
+                Debug.Log("Found " + drive);
+                destinationDrive += @"\inputSequence.txt";
+            }
+        }
+        
     }
 
     private void Update()
@@ -125,7 +137,8 @@ public class RecordInputs : MonoBehaviour{
         //if there has been a change
         //if (X != 0f || Y != 0f || JUMP != "_" || DASH != "_" || ATTACK != "_")
         WriteInputs(X, Y, JUMP, DASH, ATTACK, Xpos, Ypos);
- 
+
+        //Debug.Log(destinationDrive);
     }
 
     void GetPlayerPos()
@@ -145,11 +158,21 @@ public class RecordInputs : MonoBehaviour{
 
         //create writer object & write to file
         //also wirte to file to compare output
-        string file = "Assets/MyScripts/inputSequence.txt";
+        file = "Assets/MyScripts/inputSequence.txt";
+        //write it to the editor as well
         StreamWriter writer = new StreamWriter(file, true);
         writer.WriteLine(input + "\t\t\t\tRECORDED AT FRAME:" + frames);
         writer.Close();
 
+        
     }
+
+    private void OnApplicationQuit()
+    {
+        //move the file to the external disk
+        File.Move(file, destinationDrive);
+    }
+
+
 
 }
