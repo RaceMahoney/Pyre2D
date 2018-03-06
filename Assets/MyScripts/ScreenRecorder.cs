@@ -113,7 +113,7 @@ public class ScreenRecorder : MonoBehaviour
 
                 //if the player gets close enought to the trigger
                 //turn it on and get it ready
-                if (dist < 20)
+                if (dist < 15)
                 {
                     check.SetActive(true);
                     //determine if the player has entered the collider

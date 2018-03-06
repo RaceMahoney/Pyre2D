@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 

@@ -32,7 +32,7 @@ public class Golem_Controller : MonoBehaviour {
     private AudioSource audio_;                         //Audiosource
 
     void Start () {
-        audio_ = GetComponent<AudioSource>();
+     //   audio_ = GetComponent<AudioSource>();
         currentPoint = Random.Range(0, 2);
         SetZ();
         relativeLife = (float)2 / life;

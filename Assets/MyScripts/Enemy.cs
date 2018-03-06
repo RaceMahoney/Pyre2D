@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour {
     public float speed = 2;
     public int CurrentPoint = 0;
 
-    private int currentHealth = 20;
+    public int currentHealth = 20;
     private PlatformerCharacter2D m_Character;
 
     // Use this for initialization

@@ -6,6 +6,11 @@ TagManager:
   tags:
   - MovingPlatform
   - Ladder
+  - Demon
+  - Campfire
+  - DeathFloor
+  - Coin
+  - torch
   layers:
   - Default
   - TransparentFX

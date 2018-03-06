@@ -5,45 +5,52 @@ using UnityEngine;
 
     public class PlatformerCharacter2D : MonoBehaviour
     {
-        [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
-        [SerializeField] private float m_JumpForce = 12f;                  // Amount of force added when the player jumps.
-        [SerializeField] private float m_DashSpeed = 10f;
-        [SerializeField] private bool m_AirControl = true;                 // Whether or not a player can steer while jumping;
-        [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
+    [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
+    [SerializeField] private float m_JumpForce = 12f;                  // Amount of force added when the player jumps.
+    [SerializeField] private float m_DashSpeed = 10f;
+    [SerializeField] private bool m_AirControl = true;                 // Whether or not a player can steer while jumping;
+    [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
 
-        private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
-        const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
-        private bool m_Grounded;            // Whether or not the player is grounded.
-        private bool m_Dashing;             // Whether the player is dashing or not
-        private Transform m_CeilingCheck;   // A position marking where to check for ceilings
-        const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
-        private Animator m_Anim;            // Reference to the player's animator component.
-        private Rigidbody2D m_Rigidbody2D;
-        private bool m_FacingRight = true;  // For determining which way the player is currently facing.
-        private float vSpeed;               //Vertical speed
-        private int MAX_HEALTH = 5;
+    private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
+    const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
+    private bool m_Grounded;            // Whether or not the player is grounded.
+    private bool m_Dashing;             // Whether the player is dashing or not
+    private Transform m_CeilingCheck;   // A position marking where to check for ceilings
+    const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
+    private Animator m_Anim;            // Reference to the player's animator component.
+    private Rigidbody2D m_Rigidbody2D;
+    private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+    private float vSpeed;               //Vertical speed
+    private int MAX_HEALTH = 5;
 
-        [HideInInspector]
-        public bool validInput = true;
-        [HideInInspector]
-        public int health;
+    [HideInInspector]
+    public bool validInput = true;
+    [HideInInspector]
+    public int health;
+    [HideInInspector]
+    public int score = 0;
 
-        
+    public Vector3 respawnPoint;
+
+
+
 
 
 
 
     private void Awake()
         {
-            // Setting up references.
-            m_GroundCheck = transform.Find("GroundCheck");
-            m_CeilingCheck = transform.Find("CeilingCheck");
-            m_Anim = GetComponent<Animator>();
-            m_Rigidbody2D = GetComponent<Rigidbody2D>();
+        // Setting up references.
+        m_GroundCheck = transform.Find("GroundCheck");
+        m_CeilingCheck = transform.Find("CeilingCheck");
+        m_Anim = GetComponent<Animator>();
+        m_Rigidbody2D = GetComponent<Rigidbody2D>();
+        respawnPoint = transform.position;
+        
 
 
-            //Set max health to 
-            health = MAX_HEALTH;
+        //Set max health to 
+        health = MAX_HEALTH;
 
      
         }
@@ -70,15 +77,18 @@ using UnityEngine;
             //check if player has died
             if(health <= 0)
             {
-                m_Anim.Play("FireHeroDie");
+            //m_Anim.Play("FireHeroDie");
 
-                m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-                validInput = false;
-                Application.LoadLevel(Application.loadedLevel);
+            //m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+            //validInput = false;
+            transform.position = respawnPoint;
+            health = 5;
+            score = 0;
+            
             }
 
-      
 
+        
 
     }
 
@@ -191,6 +201,11 @@ using UnityEngine;
 
         }
 
+        public void AddScore(int numberOfCoins)
+        {
+            score += numberOfCoins;
+        }
+
         
 
         void OnTriggerEnter2D(Collider2D other)
@@ -200,7 +215,22 @@ using UnityEngine;
                 //This will make the player a child of the Obstacle
                 transform.parent = other.gameObject.transform; //Change "myPlayer" to your player
             }
-        }
+
+            if(other.gameObject.tag == "Deathfloor")
+            {
+                transform.position = respawnPoint;
+                health = 5;
+                score = 0;
+            }
+
+            if(other.gameObject.tag == "Campfire")
+            {
+                //if the player went past the checkpoint, this is will be the last posiiton
+                respawnPoint = other.transform.position;
+                respawnPoint = new Vector3(transform.position.x, transform.position.y + 1, 0f);
+            }
+
+    }
 
         private void OnTriggerStay2D(Collider2D collision)
         {
@@ -214,6 +244,7 @@ using UnityEngine;
 
         void OnTriggerExit2D(Collider2D other)
         {
+            //ladder code?
             m_Anim.SetBool("Climb", false);
             m_Anim.SetBool("Hurt", false);
            
@@ -224,7 +255,9 @@ using UnityEngine;
             {
                 m_Anim.enabled = true;
             }
-        }
+
+     
+    }
 
         public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir)
         {
@@ -240,5 +273,7 @@ using UnityEngine;
             yield return 0;
         }
 
-    }
+
+
+}
 

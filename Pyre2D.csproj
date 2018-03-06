@@ -345,7 +345,9 @@
     <Compile Include="Assets\MyScripts\attackTrigger.cs" />
     <Compile Include="Assets\MyScripts\AutoInput.cs" />
     <Compile Include="Assets\MyScripts\CameraFollow.cs" />
+    <Compile Include="Assets\MyScripts\Campfires.cs" />
     <Compile Include="Assets\MyScripts\Checkpoint.cs" />
+    <Compile Include="Assets\MyScripts\Coin.cs" />
     <Compile Include="Assets\MyScripts\Enemy.cs" />
     <Compile Include="Assets\MyScripts\GamePlayManager.cs" />
     <Compile Include="Assets\MyScripts\HorizontalMovingPlatform.cs" />
