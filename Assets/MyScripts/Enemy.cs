@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour {
         //check current health
         if(currentHealth <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             //TODO death animation
         }
 

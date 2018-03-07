@@ -31,6 +31,7 @@ using UnityEngine;
     public int score = 0;
 
     public Vector3 respawnPoint;
+    public GameObject[] enemies;
 
 
 
@@ -46,6 +47,7 @@ using UnityEngine;
         m_Anim = GetComponent<Animator>();
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
         respawnPoint = transform.position;
+        enemies = GameObject.FindGameObjectsWithTag("Demon");
         
 
 
@@ -74,16 +76,27 @@ using UnityEngine;
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-            //check if player has died
-            if(health <= 0)
+
+       
+
+        //check if player has died
+        if (health <= 0)
             {
+            foreach (GameObject demon in enemies)
+            {
+                demon.SetActive(true);
+
+            }
             //m_Anim.Play("FireHeroDie");
 
-            //m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-            //validInput = false;
             transform.position = respawnPoint;
-            health = 5;
-            score = 0;
+                health = 5;
+                score = 0;
+
+                //revive dead enemies
+             
+
+            
             
             }
 

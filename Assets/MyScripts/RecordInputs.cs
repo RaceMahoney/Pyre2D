@@ -54,7 +54,7 @@ public class RecordInputs : MonoBehaviour{
             if (drive == @"E:\")
             {
                 destinationDrive = drive;
-                destinationDrive += @"\inputSequence.txt";
+                destinationDrive += @"\inputs\inputSequence.txt";
             }
         }
         
