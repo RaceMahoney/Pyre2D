@@ -9,8 +9,11 @@ namespace UnityStandardAssets._2D
     [RequireComponent(typeof(PlatformerCharacter2D))]
     public class HUD : MonoBehaviour {
         public Sprite[] HeartSrpites;
+        public Sprite[] DashSprites;
+        public Image DashUI;
         public Image HeartUI;
         public Text scoreText;
+        public Text ready;
         private PlatformerCharacter2D m_Character;
 
         private void Start()
@@ -23,7 +26,19 @@ namespace UnityStandardAssets._2D
         {
             //update the number of hearts
             HeartUI.sprite = HeartSrpites[m_Character.health];
+            //update the amount of coins
             SetText();
+            //update dash
+            DashUI.sprite = DashSprites[m_Character.dashStatus];
+            
+            if(m_Character.dashStatus == 0)
+            {
+                ready.enabled = true;
+            } else
+            {
+                ready.enabled = false;
+            }
+
 
         }
 

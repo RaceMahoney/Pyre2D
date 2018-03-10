@@ -21,12 +21,12 @@ public class LadderController : MonoBehaviour {
     {
         try
         {
-            if (collision.tag == "Player" && Input.GetKey(KeyCode.W))
+            if (collision.tag == "Player" && Input.GetKey(KeyCode.UpArrow))
             {
                 collision.GetComponent<Rigidbody2D>().velocity = new Vector2(0, speed);
             }
 
-            else if (collision.tag == "Player" && Input.GetKey(KeyCode.S))
+            else if (collision.tag == "Player" && Input.GetKey(KeyCode.DownArrow))
             {
                 collision.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -speed);
             }

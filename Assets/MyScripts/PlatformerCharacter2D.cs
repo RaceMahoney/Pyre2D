@@ -22,6 +22,7 @@ using UnityEngine;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private float vSpeed;               //Vertical speed
     private int MAX_HEALTH = 5;
+    private float time = 0;
 
     [HideInInspector]
     public bool validInput = true;
@@ -32,6 +33,18 @@ using UnityEngine;
 
     public Vector3 respawnPoint;
     public GameObject[] enemies;
+
+    [HideInInspector]
+    public DashState dashState;
+
+    public Vector2 savedVelocity;
+    public float dashTimer;
+    public float maxDash = 8f;
+
+    public int dashStatus = 0; //start at the full dash status
+    //1 = empty
+    //2 half
+   
 
 
 
@@ -60,6 +73,7 @@ using UnityEngine;
 
         private void FixedUpdate()
         {
+       
             m_Grounded = false;
             m_Dashing = false;
 
@@ -93,20 +107,12 @@ using UnityEngine;
                 health = 5;
                 score = 0;
 
-                //revive dead enemies
-             
-
-            
-            
+                //TODO: revive dead enemies
             }
+        }
 
 
-        
-
-    }
-
-
-        public void Move(float move, bool crouch, bool jump, bool dash)
+        public void Move(float move, bool jump)
         {
         
         //only control the player if grounded or airControl is turned on
@@ -147,32 +153,80 @@ using UnityEngine;
                 
             }
 
-            //if player should dash...
-            if(dash && !m_Dashing)
-            {
-                m_Dashing = true;
-                m_Anim.SetBool("Dash", true);
-                
-                if (m_FacingRight)
-                {
-                    m_Rigidbody2D.velocity = new Vector2(m_DashSpeed, 0f);  
-                }
-                if (!m_FacingRight)
-                {
-                    m_Rigidbody2D.velocity = new Vector2(-m_DashSpeed, 0f);
-                }
-                
+            ////if player should dash...
+            //if(dash && !m_Dashing)
+            //{
+            //    m_Dashing = true;
+            //    m_Anim.SetBool("Dash", true);
 
-            }
-            //keep dash off if button is not pressed
-            if (!dash)
-            {
-                m_Dashing = false;
-                m_Anim.SetBool("Dash", false);
-            }
+            //    StartCoroutine(DashTime());
+                
+            //}
+            ////keep dash off if button is not pressed
+            //if (!dash)
+            //{
+            //    m_Dashing = false;
+            //    m_Anim.SetBool("Dash", false);
+            //}
         }
 
-        public void Attack()
+    public void Dash(bool isDashing)
+    {
+        
+        switch (dashState)
+        {
+            //state is ready and waiting for input
+            case DashState.Ready:
+                dashStatus = 0;
+                if (isDashing)
+                {
+                    //once dash key is pressed, 
+                    //save the velocity for later, incrase velocity by 3 and enter dashing state
+                    savedVelocity = m_Rigidbody2D.velocity;
+
+                    //check if there is movement at all, if not set velocity to 1 so can move from a standing positon
+                    if (m_Rigidbody2D.velocity.x == 0 && m_FacingRight)
+                    {
+                        m_Rigidbody2D.velocity = new Vector2(8f, 0); //set the velocity to one in case 
+                    }
+                    if(m_Rigidbody2D.velocity.x == 0 && !m_FacingRight)
+                    {
+                        m_Rigidbody2D.velocity = new Vector2(-8f, 0);
+                    }
+                    
+                    //m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x * 18f, m_Rigidbody2D.velocity.y);
+                    StartCoroutine(DashTime());
+                    
+                    dashState = DashState.Dashing;
+                }
+                break;
+            //state is dashing and timer is waiting to return player back to saved velocity
+            case DashState.Dashing:
+                dashStatus = 2;
+                
+                dashTimer += Time.deltaTime * 3;
+                if (dashTimer >= maxDash)
+                {
+                   m_Rigidbody2D.velocity = savedVelocity;
+                   dashState = DashState.Cooldown;
+                }
+                break;
+            //state is in cooldown and will be send back to ready when timer is done
+            case DashState.Cooldown:
+                dashStatus = 1;
+                
+                dashTimer -= Time.deltaTime * 3;
+                //UnityEngine.Debug.Log(dashTimer);
+                if (dashTimer <= 0)
+                {
+                    dashTimer = 0;
+                    dashState = DashState.Ready;
+                }
+                break;
+        }
+    }
+
+    public void Attack()
         {
             m_Anim.Play("FireHeroAttack");
             
@@ -243,7 +297,7 @@ using UnityEngine;
                 respawnPoint = new Vector3(transform.position.x, transform.position.y + 1, 0f);
             }
 
-    }
+        }
 
         private void OnTriggerStay2D(Collider2D collision)
         {
@@ -270,7 +324,7 @@ using UnityEngine;
             }
 
      
-    }
+        }
 
         public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir)
         {
@@ -286,7 +340,31 @@ using UnityEngine;
             yield return 0;
         }
 
+    public enum DashState
+    {
+        Ready,
+        Dashing,
+        Cooldown
+    }
+
+    public IEnumerator DashTime()
+    {
+        float timePassed = 0;
+        while(timePassed < 0.2f)
+        {
+            m_Anim.SetBool("Dash", true);
+            timePassed += Time.deltaTime;
+            Debug.Log(timePassed);
+            m_Rigidbody2D.AddRelativeForce(new Vector2(m_Rigidbody2D.velocity.x * 30f, 0f));
+            yield return 0; //go to the next frame
+        }
+        m_Anim.SetBool("Dash", false);
+        yield return null;
+    }
+
+    }
 
 
-}
+
+
 

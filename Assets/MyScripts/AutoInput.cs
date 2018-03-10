@@ -13,7 +13,7 @@ public class AutoInput : MonoBehaviour {
     private PauseMenu menu;
 
     private static string input;
-    private static string path = "Assets/MyScripts/inputSequence.txt";
+    private static string path = @"E:\inpus\inputSequence.txt";
     private bool m_Jump;
     private bool m_Dash;
     private bool m_Attack;
@@ -153,15 +153,13 @@ public class AutoInput : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        //TODO remove all trace of crouch option from code
-        bool crouch = false;
-        
-        //move the player with the correct recored values
-        player.Move(X, crouch, m_Jump, m_Dash);
 
+        //move the player with the correct recored values
+        player.Move(X, m_Jump);
+        player.Dash(m_Dash);
         //pause or unpause the game
         //TODO implement the pause into replay
-       // menu.paused = m_Pause;
+        // menu.paused = m_Pause;
 
 
         //check if XPos and YPos are NOT ZERO

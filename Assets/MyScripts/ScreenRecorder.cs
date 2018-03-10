@@ -127,7 +127,6 @@ public class ScreenRecorder : MonoBehaviour
                     if (trigger)
                     {
                         captureScreenshot = true;
-                        StartCoroutine(OneFrameOneShot());
                         
                     } else
                     {
@@ -145,22 +144,47 @@ public class ScreenRecorder : MonoBehaviour
             //gameobject was not there
         }
 
-        //if (captureScreenshot)
-        //{
-        //    Debug.Log("Made it to the if statement");
-        //     StartCoroutine(OneFrameOneShot());
-        //    captureScreenshot = false;
-        //}
-
        
     }
-           
 
-        ///////////////////////////////////////////////////////////
+    private void OnPostRender()
+    {
+
+        if (captureScreenshot)
+        {
+            // hide optional game object if set
+            if (hideGameObject != null) hideGameObject.SetActive(false);
+
+            // create a texture to pass to encoding
+            Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+
+            // put buffer into texture
+            texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+            texture.Apply();
+
+            byte[] bytes = texture.EncodeToPNG();
+
+            // save our test image (could also upload to WWW)
+             File.WriteAllBytes(Application.dataPath + "/screenshots/image_" + count + ".png", bytes);
+             count++;
+
+            // Added by Karl. - Tell unity to delete the texture, by default it seems to keep hold of it and memory crashes will occur after too many screenshots.
+            DestroyObject(texture);
+
+            // unhide optional game object if set
+            if (hideGameObject != null) hideGameObject.SetActive(true);
+
+            captureScreenshot = false;
+        }
+
+    }
+
+
+    ///////////////////////////////////////////////////////////
 
     //private void Capture()
     //{
-  
+
     //    Debug.Log("Screen shot was taken");
     //    captureScreenshot = false;
 
@@ -237,34 +261,10 @@ public class ScreenRecorder : MonoBehaviour
     //        renderTexture = null;
     //        screenShot = null;
     //    }
-        
+
     //}
-        /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
 
-    private IEnumerator OneFrameOneShot()
-    {
-        // wait for graphics to render
-        yield return new WaitForEndOfFrame();
-
-        // create a texture to pass to encoding
-        Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-
-        // put buffer into texture
-        texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-        texture.Apply();
-
-        // split the process up--ReadPixels() and the GetPixels() call inside of the encoder are both pretty heavy
-        yield return 0;
-
-        byte[] bytes = texture.EncodeToPNG();
-
-        // save our test image (could also upload to WWW)
-        File.WriteAllBytes(Application.dataPath + "/screenshots/image_" + count + ".png", bytes);
-        count++;
-
-        // Added by Karl. - Tell unity to delete the texture, by default it seems to keep hold of it and memory crashes will occur after too many screenshots.
-        DestroyObject(texture);
-    }
-    
+ 
 }
 

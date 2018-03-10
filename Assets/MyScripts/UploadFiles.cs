@@ -1,5 +1,4 @@
-﻿using Firebase.Storage;
-using System.IO;
+﻿using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ public class UploadFiles : MonoBehaviour {
         string[] drives = Directory.GetLogicalDrives();
         foreach (string drive in drives)
         {
-            if (drive == @"C:\")
+            if (drive == @"E:\")
             {
                 destinationDrive = drive;
                 Debug.Log("Found " + drive);
@@ -37,14 +36,14 @@ public class UploadFiles : MonoBehaviour {
            //check to see if the file exits within the game and that it does not exist int he destination
             if (File.Exists(file) && !File.Exists(destinationDrive + count + ".png"))
             {
-                File.Copy(file, destinationDrive + count + ".png");         
+                //File.Copy(file, destinationDrive + count + ".png");
+                File.Copy(file, @"D:\UnityProjects\Platformer\Pyre2D\screenshots\image_" + count + ".png");
             }
             else
             {
                 Debug.Log("Could not copy file");
             }
-            count++;
-           
+            count += 2;
         }
 
     }

@@ -304,6 +304,12 @@
     <Reference Include="Google.VersionHandlerImpl_v1.2.61.0">
       <HintPath>Assets/PlayServicesResolver/Editor/Google.VersionHandlerImpl_v1.2.61.0.dll</HintPath>
     </Reference>
+    <Reference Include="Magick.NET-Q16-x64">
+      <HintPath>Assets/Plugins/Magick.NET-Q16-x64.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>Assets/Plugins/System.Drawing.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>C:/Users/Race/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
@@ -348,6 +354,7 @@
     <Compile Include="Assets\MyScripts\Campfires.cs" />
     <Compile Include="Assets\MyScripts\Checkpoint.cs" />
     <Compile Include="Assets\MyScripts\Coin.cs" />
+    <Compile Include="Assets\MyScripts\CompareImages.cs" />
     <Compile Include="Assets\MyScripts\Enemy.cs" />
     <Compile Include="Assets\MyScripts\GamePlayManager.cs" />
     <Compile Include="Assets\MyScripts\HorizontalMovingPlatform.cs" />

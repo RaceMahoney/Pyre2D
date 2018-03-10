@@ -10,23 +10,17 @@ using System.Collections;
 public class Platformer2DUserControl : MonoBehaviour
 {
     private PlatformerCharacter2D m_Character;
+    private PlatformerCharacter2D rigidbody;
     private PlayerAttack playerAttack;
 
     [HideInInspector]
-    public bool m_Jump;
+    public bool m_Jump;         //current jump state
     [HideInInspector]
-    public bool m_Dash;
+    public bool m_Attack;       //current attack state
     [HideInInspector]
-    public bool m_Attack;
-
+    public bool m_Dash;       //current attack state
+   
     private float h = 0f;
-    private long pressTime = 0;
-    private long coolTime = 0;
-    private bool dashReady = true;
-    private float temp = 0f;
-    Stopwatch stopWatch = new Stopwatch();
-    Stopwatch coolDown = new Stopwatch();
-
   
 
 
@@ -34,6 +28,7 @@ public class Platformer2DUserControl : MonoBehaviour
     {
         m_Character = GetComponent<PlatformerCharacter2D>();
         playerAttack = GetComponent<PlayerAttack>();
+
        
     }
 
@@ -51,42 +46,10 @@ public class Platformer2DUserControl : MonoBehaviour
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
 
-            if (!m_Dash)
-            {
-                //read the dash input in Update so butten presses aren't missed
-                if (CrossPlatformInputManager.GetButton("Dash") && dashReady)
-                {
-                    stopWatch.Start();
-                    m_Dash = true;
-                    pressTime = stopWatch.ElapsedMilliseconds;
-
-
-                    if (pressTime >= 200)
-                    {
-                        m_Dash = false;
-                        dashReady = false;
-                    }
-
-                }
+            if (!m_Dash){
+                m_Dash = CrossPlatformInputManager.GetButtonDown("Dash");
             }
 
-            if (CrossPlatformInputManager.GetButtonUp("Dash"))
-            {
-                //stop the watch
-                stopWatch.Stop();
-                stopWatch.Reset();
-
-                //start the cool down watch
-                coolDown.Start();
-                coolTime = coolDown.ElapsedMilliseconds;
-                if (coolTime >= 3000)
-                {
-                    dashReady = true;
-                    coolDown.Stop();
-                    coolDown.Reset();
-                }
-
-            }
         }
     }
 
@@ -95,16 +58,17 @@ public class Platformer2DUserControl : MonoBehaviour
 
         if (m_Character.validInput)
         {
-            // Read the inputs.
-            bool crouch = Input.GetKey(KeyCode.LeftControl);
-            // Pass all parameters to the character control script.
-            m_Character.Move(h, crouch, m_Jump, m_Dash);
-            //UnityEngine.Debug.Log("Speed it: " + h);
+          
+            m_Character.Move(h, m_Jump);
+            m_Character.Dash(m_Dash);
+            
 
             m_Jump = false;
             m_Dash = false;
 
         }
     }
+
+
 }
 
