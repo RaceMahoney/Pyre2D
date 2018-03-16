@@ -304,6 +304,15 @@
     <Reference Include="Google.VersionHandlerImpl_v1.2.61.0">
       <HintPath>Assets/PlayServicesResolver/Editor/Google.VersionHandlerImpl_v1.2.61.0.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>Assets/Plugins/System.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="Magick.NET-Q16-x64">
+      <HintPath>Assets/Plugins/Magick/Magick.NET-Q16-x64.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>Assets/Plugins/Magick/System.Drawing.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>C:/Users/Race/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
@@ -324,12 +333,6 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/Race/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>Assets/Plugins/System.Drawing.dll</HintPath>
-    </Reference>
-    <Reference Include="Magick.NET-Q16-x64">
-      <HintPath>Assets/Plugins/Magick.NET-Q16-x64.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +388,7 @@
     <None Include="Assets\Firebase\Plugins\link.xml" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
+    <None Include="Assets\MyScripts\enemySequence.txt" />
     <None Include="Assets\MyScripts\inputSequence.txt" />
     <None Include="Assets\MyScripts\positions.txt.txt" />
     <None Include="Assets\PlayServicesResolver\Editor\play-services-resolver_v1.2.61.0.txt" />

@@ -12,6 +12,7 @@ public class Platformer2DUserControl : MonoBehaviour
     private PlatformerCharacter2D m_Character;
     private PlatformerCharacter2D rigidbody;
     private PlayerAttack playerAttack;
+   
 
     [HideInInspector]
     public bool m_Jump;         //current jump state
@@ -28,6 +29,7 @@ public class Platformer2DUserControl : MonoBehaviour
     {
         m_Character = GetComponent<PlatformerCharacter2D>();
         playerAttack = GetComponent<PlayerAttack>();
+        
 
        
     }
@@ -35,8 +37,10 @@ public class Platformer2DUserControl : MonoBehaviour
 
     private void Update()
     {
+        
         if (m_Character.validInput)
         {
+            
             //get the current float X value
             h = CrossPlatformInputManager.GetAxis("Horizontal");
 
@@ -44,6 +48,7 @@ public class Platformer2DUserControl : MonoBehaviour
             {
                 // Read the jump input in Update so button presses aren't missed.
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+                
             }
 
             if (!m_Dash){

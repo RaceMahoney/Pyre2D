@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityStandardAssets._2D;
+//using System.Windows.Forms;
+
 
 
 //get connected to player controller
@@ -13,12 +15,12 @@ public class AutoInput : MonoBehaviour {
     private PauseMenu menu;
 
     private static string input;
-    private static string path = @"E:\inpus\inputSequence.txt";
+    private static string destinationDrive;         //eventually set to the destination drive E:\
     private bool m_Jump;
     private bool m_Dash;
     private bool m_Attack;
     private bool m_Pause;
-    private int index = 0;
+    private int index = 1;
     private float xfloat;
     private float yfloat;
     private bool attacking = false;
@@ -27,7 +29,7 @@ public class AutoInput : MonoBehaviour {
     private Animator m_Anim;
     public float speed = 0.3f;
     private double nextActionTime = 0.0;
-    private double peroid = 0.4;
+    private double peroid = 5.0;
 
     //the 8 variables to be written to the file and their default values
     private float X = 0f;
@@ -35,8 +37,7 @@ public class AutoInput : MonoBehaviour {
     private string JUMP = "_";
     private string DASH = "_";
     private string ATTACK = "_";
-    private string PAUSE = "_";
-    private float TIME = 0f;
+    public float TIME = 0f;
     private float XPos = 0f;
     private float YPos = 0f;
 
@@ -47,6 +48,17 @@ public class AutoInput : MonoBehaviour {
 
     private void Awake()
     {
+        
+        //find the correct destination drive
+        string[] drives = Directory.GetLogicalDrives();
+        foreach (string drive in drives)
+        {
+            if (drive == @"E:\")
+            {
+                destinationDrive = drive;
+                destinationDrive += @"\inputs\inputSequence.txt";
+            }
+        }
 
         player = GetComponent<PlatformerCharacter2D>();
         m_Anim = gameObject.GetComponent<Animator>();
@@ -65,9 +77,13 @@ public class AutoInput : MonoBehaviour {
 
     private void Update()
     {
+        
         GetPlayerInput(index);
         Time.fixedDeltaTime = TIME; //update the max time with each new frame
         index++;
+
+   
+
     }
 
     private void GetPlayerInput(int index)
@@ -78,7 +94,7 @@ public class AutoInput : MonoBehaviour {
             //break that string into its appropriate variables to replicate
             //every frame value from the human player
             string line = input_list[index];
-            string[] values = line.Split(new Char[] { ',', ',', ',', ',' , ',' , ',' , ',' , ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] values = line.Split(new Char[] {',', ',', ',' , ',' , ',' , ',' , ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             //save current values to variables to check this frame
             X = float.Parse(values[0]);
@@ -86,10 +102,9 @@ public class AutoInput : MonoBehaviour {
             JUMP = values[2];
             DASH = values[3];
             ATTACK = values[4];
-            PAUSE = values[5];
-            TIME = float.Parse(values[6]);
-            XPos = float.Parse(values[7]);
-            YPos = float.Parse(values[8]);
+            TIME = float.Parse(values[5]);
+            XPos = float.Parse(values[6]);
+            YPos = float.Parse(values[7]);
 
             //Set Target Position
             targetPos = new Vector2(XPos, YPos);
@@ -120,7 +135,9 @@ public class AutoInput : MonoBehaviour {
             {
                 m_Anim.Play("FireHeroAttack");
                 attacking = true;
+                attackTimer = attackCd;
                 attackTrigger.enabled = true;
+                
             }
 
             if (attacking)
@@ -157,15 +174,17 @@ public class AutoInput : MonoBehaviour {
         //move the player with the correct recored values
         player.Move(X, m_Jump);
         player.Dash(m_Dash);
+
+
         //pause or unpause the game
         //TODO implement the pause into replay
         // menu.paused = m_Pause;
-
 
         //check if XPos and YPos are NOT ZERO
         //if so, make a correction
         if (XPos != 0 || YPos != 0)
         {
+            player.m_Rigidbody2D.velocity = Vector2.zero;
             player.Correction(targetPos, X);
             updatePos();
         }
@@ -173,21 +192,36 @@ public class AutoInput : MonoBehaviour {
 
         m_Jump = false;
         m_Dash = false;
-      
+
+        //if x seconds have passed
+        ////then get the current player position and write it to a file
+        //if (Time.time > nextActionTime)
+        //{
+        //    nextActionTime += peroid;
+        //    StartCoroutine(Sync());
+        //}
+
     }
     
 
     static void ReadString()
     {
-        //create reader and add each object into list
-        StreamReader reader = new StreamReader(path);
-        for(int i = 0; reader.Peek() > 0; i++)
+        if (File.Exists(destinationDrive))
         {
-            input = reader.ReadLine();
-            input_list.Add(input);
-                
+            //create reader and add each object into list
+            StreamReader reader = new StreamReader(destinationDrive);
+            for (int i = 0; reader.Peek() > 0; i++)
+            {
+                input = reader.ReadLine();
+                input_list.Add(input);
+            }
+            reader.Close();
         }
-        reader.Close();
+        else
+        {
+            Debug.Log("Cannot find the file");
+        }
+       
     }
 
     private void updatePos()
@@ -195,6 +229,23 @@ public class AutoInput : MonoBehaviour {
         //move to correct position  without telemorting
         transform.position = new Vector2(XPos, YPos);
         
+    }
+
+    private IEnumerator Sync()
+    {
+        //turn off the time to catch up
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(3);
+        updatePos();
+        Time.timeScale = 0.1f;
+    }
+
+    private void displayStuff()
+    {
+        //display x
+        Debug.Log("Frame:" + Time.frameCount);
+        Debug.Log("Current X:" + player.m_Rigidbody2D.velocity.x);
+        Debug.Log("Read X:" + X);
     }
 
 }

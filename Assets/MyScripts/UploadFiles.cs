@@ -26,7 +26,6 @@ public class UploadFiles : MonoBehaviour {
         destinationDrive += @"screenshots\image_";
 
       
-
         //find the needed files in the game
         var path = Application.dataPath + "/screenshots/";
         var dirInfo = new System.IO.DirectoryInfo(path).GetFiles();
@@ -36,8 +35,8 @@ public class UploadFiles : MonoBehaviour {
            //check to see if the file exits within the game and that it does not exist int he destination
             if (File.Exists(file) && !File.Exists(destinationDrive + count + ".png"))
             {
-                //File.Copy(file, destinationDrive + count + ".png");
-                File.Copy(file, @"D:\UnityProjects\Platformer\Pyre2D\screenshots\image_" + count + ".png");
+                File.Copy(file, destinationDrive + count + ".png");
+                //File.Copy(file, @"D:\UnityProjects\Platformer\Pyre2D\screenshots\image_" + count + ".png");
             }
             else
             {

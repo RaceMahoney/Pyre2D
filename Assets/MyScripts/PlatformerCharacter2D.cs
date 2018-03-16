@@ -18,7 +18,7 @@ using UnityEngine;
     private Transform m_CeilingCheck;   // A position marking where to check for ceilings
     const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
     private Animator m_Anim;            // Reference to the player's animator component.
-    private Rigidbody2D m_Rigidbody2D;
+    public Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private float vSpeed;               //Vertical speed
     private int MAX_HEALTH = 5;
@@ -37,6 +37,8 @@ using UnityEngine;
     [HideInInspector]
     public DashState dashState;
 
+    private Platformer2DUserControl controller;
+
     public Vector2 savedVelocity;
     public float dashTimer;
     public float maxDash = 8f;
@@ -44,6 +46,8 @@ using UnityEngine;
     public int dashStatus = 0; //start at the full dash status
     //1 = empty
     //2 half
+
+
    
 
 
@@ -61,6 +65,7 @@ using UnityEngine;
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
         respawnPoint = transform.position;
         enemies = GameObject.FindGameObjectsWithTag("Demon");
+        controller = GetComponent<Platformer2DUserControl>();
         
 
 
@@ -73,6 +78,8 @@ using UnityEngine;
 
         private void FixedUpdate()
         {
+ 
+        
        
             m_Grounded = false;
             m_Dashing = false;
@@ -112,7 +119,7 @@ using UnityEngine;
         }
 
 
-        public void Move(float move, bool jump)
+    public void Move(float move, bool jump)
         {
         
         //only control the player if grounded or airControl is turned on
@@ -180,19 +187,18 @@ using UnityEngine;
                 dashStatus = 0;
                 if (isDashing)
                 {
+                    //check if there is no movement at all, if not set velocity to 10 so can move from a standing positon
+                    if (m_Rigidbody2D.velocity.x == 0 && m_FacingRight)
+                    {
+                        m_Rigidbody2D.velocity = new Vector2(50f, 0); //set the velocity to one in case 
+                    }
+                    if (m_Rigidbody2D.velocity.x == 0 && !m_FacingRight)
+                    {
+                        m_Rigidbody2D.velocity = new Vector2(-50f, 0);
+                    }
                     //once dash key is pressed, 
                     //save the velocity for later, incrase velocity by 3 and enter dashing state
                     savedVelocity = m_Rigidbody2D.velocity;
-
-                    //check if there is movement at all, if not set velocity to 1 so can move from a standing positon
-                    if (m_Rigidbody2D.velocity.x == 0 && m_FacingRight)
-                    {
-                        m_Rigidbody2D.velocity = new Vector2(8f, 0); //set the velocity to one in case 
-                    }
-                    if(m_Rigidbody2D.velocity.x == 0 && !m_FacingRight)
-                    {
-                        m_Rigidbody2D.velocity = new Vector2(-8f, 0);
-                    }
                     
                     //m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x * 18f, m_Rigidbody2D.velocity.y);
                     StartCoroutine(DashTime());
@@ -233,45 +239,45 @@ using UnityEngine;
         }
 
 
-        private void Flip()
-        {
-            // Switch the way the player is labelled as facing.
-            m_FacingRight = !m_FacingRight;
+    private void Flip()
+    {
+        // Switch the way the player is labelled as facing.
+        m_FacingRight = !m_FacingRight;
 
-            // Multiply the player's x local scale by -1.
-            Vector3 theScale = transform.localScale;
-            theScale.x *= -1;
-            transform.localScale = theScale;
-        }
+        // Multiply the player's x local scale by -1.
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
 
-        public void Damage(int dmg)
-        {
-            //player has been hit by an enemy
-            health -= dmg;
-            gameObject.GetComponent<Animation>().Play("FireHeroHurt");
-        }
+    public void Damage(int dmg)
+    {
+        //player has been hit by an enemy
+        health -= dmg;
+        gameObject.GetComponent<Animation>().Play("FireHeroHurt");
+    }
 
-        public void SetVelocityY(float Y)
-        {
-            m_Rigidbody2D.velocity = new Vector2(0f, Y);
-        }
+    public void SetVelocityY(float Y)
+    {
+        m_Rigidbody2D.velocity = new Vector2(0f, Y);
+    }
 
-        public float GetVelocityY()
-        {
-            float velY = m_Rigidbody2D.velocity.y;
-            return velY;
-        }
+    public float GetVelocityY()
+    {
+        float velY = m_Rigidbody2D.velocity.y;
+        return velY;
+    }
 
-        public void Correction(Vector2 target, float move)
-        {
-            transform.position = Vector2.MoveTowards(transform.position, target, move * Time.deltaTime);
+    public void Correction(Vector2 target, float move)
+    {
+        transform.position = Vector2.MoveTowards(transform.position, target, move * Time.deltaTime);
 
-        }
+    }
 
-        public void AddScore(int numberOfCoins)
-        {
-            score += numberOfCoins;
-        }
+    public void AddScore(int numberOfCoins)
+    {
+        score += numberOfCoins;
+    }
 
         
 
@@ -355,7 +361,7 @@ using UnityEngine;
             m_Anim.SetBool("Dash", true);
             timePassed += Time.deltaTime;
             Debug.Log(timePassed);
-            m_Rigidbody2D.AddRelativeForce(new Vector2(m_Rigidbody2D.velocity.x * 30f, 0f));
+            m_Rigidbody2D.AddRelativeForce(new Vector2(m_Rigidbody2D.velocity.x *100f, 0f));
             yield return 0; //go to the next frame
         }
         m_Anim.SetBool("Dash", false);

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets._2D;
@@ -12,18 +13,44 @@ public class Enemy : MonoBehaviour {
 
     public int currentHealth = 20;
     private PlatformerCharacter2D m_Character;
+    private AutoInput autoInput;
+    private GameObject autoRef;
 
 
     // Use this for initialization
     void Start () {
         m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
+        autoInput = GetComponent<AutoInput>();
+       
     }
 	
 	// Update is called once per frame
 	void Update () {
+        try
+        {
+            autoRef = GameObject.Find("AUTO_FireHero");
+            if (autoRef.activeInHierarchy)
+            {
+                Time.fixedDeltaTime = autoInput.TIME;
+            }
+        } catch (NullReferenceException e)
+        {
 
-        
+        }
+       
+     
+        //check current health
+        if(currentHealth <= 0)
+        {
+            gameObject.SetActive(false);
+            //TODO death animation
+        }
 
+
+    }
+
+    private void FixedUpdate()
+    {
         if (transform.position.x != Waypoints[CurrentPoint].transform.position.x)
         {
             transform.position = Vector3.MoveTowards(transform.position, Waypoints[CurrentPoint].transform.position, speed * Time.deltaTime);
@@ -37,14 +64,6 @@ public class Enemy : MonoBehaviour {
         {
             CurrentPoint = 0;
         }
-
-        //check current health
-        if(currentHealth <= 0)
-        {
-            gameObject.SetActive(false);
-            //TODO death animation
-        }
-
 
     }
 
