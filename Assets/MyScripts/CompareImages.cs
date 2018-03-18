@@ -4,19 +4,21 @@ using UnityEngine;
 using ImageMagick;
 using System.IO;
 
-public class CompareImages : MonoBehaviour {
+public class CompareImages : MonoBehaviour
+{
 
     private string oldImagePath;
     private string newImagePath;
     private int count = 0;
     private string destinationDrive;
-   
+
     private List<string> localImages = new List<string>();
     private List<string> destImages = new List<string>();
 
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         //find the correct destination drive
         string[] drives = Directory.GetLogicalDrives();
 
@@ -27,7 +29,7 @@ public class CompareImages : MonoBehaviour {
                 destinationDrive = drive;
             }
         }
-        destinationDrive += @"screenshots";   
+        destinationDrive += @"screenshots";
     }
 
     private void OnApplicationQuit()
@@ -43,40 +45,43 @@ public class CompareImages : MonoBehaviour {
         //fill list with all the local images are
         foreach (string localfile in Directory.GetFiles(localpath))
         {
-            localImages.Add(localfile);
+            //make sure to get the png files and not the META files
+            if (Path.GetExtension(localfile) == ".png")
+                localImages.Add(localfile);
         }
 
         //fill list with all local images are
         foreach (string destfile in Directory.GetFiles(destinationDrive))
         {
-            //destImages.Add(destfile);
-            Debug.Log(destfile);
+            destImages.Add(destfile);
         }
 
-        //for (int i = 0; i <= localImages.Count; i++)
-        //{
-        //    //check to see if the file exits within the game and that it does not exist int the destination
-        //    if (File.Exists(localImages[i]) && !File.Exists(destImages[i]))
-        //    {
-        //        using (var img1 = new MagickImage(destImages[i]))
-        //        {
-        //            using (var img2 = new MagickImage(localImages[i+1]))
-        //            {
-        //                using (var imgdiff = new MagickImage())
-        //                {
-        //                    double diff = img1.Compare(img2, new ErrorMetric(), imgdiff);
-        //                    imgdiff.Write(@"D:\UnityProjects\Platformer\Pyre2D\screenshots\Differences\image_DIFF_" + i + ".png");
-        //                }
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("Could not compare images. Whoops");
-        //    }
-            
 
-        
+        for (int i = 0; i <= localImages.Count; i++)
+        {
+            //check to see if the file exits within the game and exist in the destination
+            if (File.Exists(localImages[i]) && File.Exists(destImages[i]))
+            {
+                using (var img1 = new MagickImage(destImages[i]))
+                {
+                    using (var img2 = new MagickImage(localImages[i]))
+                    {
+                        using (var imgdiff = new MagickImage())
+                        {
+                            double diff = img1.Compare(img2, new ErrorMetric(), imgdiff);
+                            imgdiff.Write(@"D:\UnityProjects\Platformer\Pyre2D\screenshots\Differences\image_DIFF_" + i + ".png");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("Could not compare images. Whoops");
+            }
+
+
+
+        }
     }
 }
 

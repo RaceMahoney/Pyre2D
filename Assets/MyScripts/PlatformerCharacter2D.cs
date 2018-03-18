@@ -76,7 +76,7 @@ using UnityEngine;
         }
 
 
-        private void FixedUpdate()
+    private void FixedUpdate()
         {
  
         
@@ -96,6 +96,7 @@ using UnityEngine;
 
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
+        Debug.Log(m_Rigidbody2D.velocity.x);
 
 
        
