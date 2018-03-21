@@ -33,7 +33,7 @@ public class SrirachaHealth : MonoBehaviour {
                     }
                 }
                 ///TODO play a sound effect
-                Destroy(bottle);
+                bottle.SetActive(false);
             }
             
         }

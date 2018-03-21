@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using System.Collections.Generic;
 
 // Screen Recorder will save individual images of active scene in any resolution and of a specific image format
 // including raw, jpg, png, and ppm.  Raw and PPM are the fastest image formats for saving.
@@ -44,30 +45,36 @@ public class ScreenRecorder : MonoBehaviour
     private bool trigger;
 
     private string destinationDrive;
-    private string dataPath = @"";
+    private string dataPath;
 
     public Texture2D[] textures;
     private int count = 0;
 
+    [HideInInspector]
+    public List<Vector3> screenPos;
+    [HideInInspector]
+    public bool isReplay = false;
+
     private double nextActionTime = 0.0;
     public double peroid = 3;
+
 
 
     void Start()
     {
         checkpointTrigger = GetComponent<Checkpoint>();
 
-        //find the correct destination drive
-        string[] drives = Directory.GetLogicalDrives();
-        foreach (string drive in drives)
-        {
-            if (drive == @"E:\") //need to replace with whatever the USB drive name is
-            {
-                destinationDrive = drive;
-            }
-        }
+    //    //find the correct destination drive
+    //    string[] drives = Directory.GetLogicalDrives();
+    //    foreach (string drive in drives)
+    //    {
+    //        if (drive == @"E:\") //need to replace with whatever the USB drive name is
+    //        {
+    //            destinationDrive = drive;
+    //        }
+    //    }
 
-        folder = destinationDrive;
+    //    folder = destinationDrive;
     }
 
 
@@ -104,29 +111,94 @@ public class ScreenRecorder : MonoBehaviour
         return filename;
     }
 
- 
+
+
+
 
     void Update()
     {
-
-        //if x seconds have passed
-        //then get the current player position and write it to a file
-        if (Time.time >= nextActionTime)
+        if (isReplay)
         {
-            nextActionTime += peroid;
-            captureScreenshot = true;
+            try
+            {
+                foreach (Vector3 vect in screenPos)
+                {
+                    float dist = Vector3.Distance(transform.position, vect);
+                    //transform string to vector
+                    if (dist > 0 && dist < 0.5f)
+                    {
+                        captureScreenshot = true;
+                        //made it to this vector
+                        Debug.Log("Made it to the target " + vect);
+                        //remove this vector so it is not triggered again
+                        screenPos.Remove(vect);
+                    }
+                    else
+                        captureScreenshot = false;
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.Log("List of attack points are now empty");
+            }
         } else
         {
-            captureScreenshot = false;
+            if (Time.time >= nextActionTime)
+            {
+                nextActionTime += peroid;
+                screenPos.Add(transform.position);
+                captureScreenshot = true;
+            } else
+            {
+                captureScreenshot = false;
+            }
         }
-        
+      
+
+
+        //try
+        //{
+        //    foreach (GameObject check in checkpoints)
+        //    {
+        //        //calculate distance of that checkpoint
+        //        float dist = Vector3.Distance(transform.position, check.transform.position);
+
+        //        //if the player gets close enought to the trigger
+        //        //turn it on and get it ready
+        //        if (dist < 15)
+        //        {
+        //            check.SetActive(true);
+        //            //determine if the player has entered the collider
+        //            Checkpoint checkScript = check.GetComponent<Checkpoint>();
+        //            trigger = checkScript.getBool();
+
+        //            if (trigger)
+        //            {
+        //                captureScreenshot = true;
+        //                checkScript.DisableBool();
+        //            }
+        //            else
+        //                captureScreenshot = false;
+        //        }
+        //        else
+        //        {
+        //            check.SetActive(false);
+        //        }
+
+        //    }
+        //}
+        //catch (NullReferenceException e)
+        //{
+        ////gameobject was not there
+        //}
+
 
     }
 
     public void CaptureScreenshot()
     {
         captureScreenshot = true;
-        
+
     }
 
     private void OnPostRender()
@@ -147,8 +219,8 @@ public class ScreenRecorder : MonoBehaviour
             byte[] bytes = texture.EncodeToPNG();
 
             // save our test image (could also upload to WWW)
-             File.WriteAllBytes(Application.dataPath + "/screenshots/image_" + count + ".png", bytes);
-             count++;
+            File.WriteAllBytes(Application.dataPath + "/screenshots" + dataPath + "/image_" + count + ".png", bytes);
+            count++;
 
             // Added by Karl. - Tell unity to delete the texture, by default it seems to keep hold of it and memory crashes will occur after too many screenshots.
             DestroyObject(texture);
@@ -164,14 +236,16 @@ public class ScreenRecorder : MonoBehaviour
     }
 
 
-    private IEnumerator Tick()
+    public void SetOrganicPath()
     {
-        while (true)
-        {
-            CaptureScreenshot();
-            yield return new WaitForSeconds(10);
-        }
-       
+        dataPath = "/Organic";
+        isReplay = false;
+    }
+
+    public void SetAutomatedPath()
+    {
+        dataPath = "/Automated";
+        isReplay = true;
     }
 
  

@@ -14,13 +14,14 @@ public class Coin : MonoBehaviour {
         player = FindObjectOfType<PlatformerCharacter2D>();
 	}
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
 
         if (other.gameObject.tag == "Player")
         {
             player.AddScore(value);
-            Destroy(coin);
+            coin.SetActive(false);
         }
     }
+
 }

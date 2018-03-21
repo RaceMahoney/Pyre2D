@@ -23,6 +23,8 @@ using UnityEngine;
     private float vSpeed;               //Vertical speed
     private int MAX_HEALTH = 5;
     private float time = 0;
+    public bool replayMode = false;
+  
 
     [HideInInspector]
     public bool validInput = true;
@@ -47,14 +49,9 @@ using UnityEngine;
     //1 = empty
     //2 half
 
+    private float oldTransform;
 
    
-
-
-
-
-
-
 
     private void Awake()
         {
@@ -66,40 +63,63 @@ using UnityEngine;
         respawnPoint = transform.position;
         enemies = GameObject.FindGameObjectsWithTag("Demon");
         controller = GetComponent<Platformer2DUserControl>();
-        
-
 
         //Set max health to 
         health = MAX_HEALTH;
 
+        oldTransform = transform.position.x;
      
         }
 
+    private void Update()
+    {
+        // Manually set the speed animation float if in replay mode
+        if (replayMode)
+        {
+            float value;
+            //check if moving 
+            if (oldTransform > transform.position.x)
+            {
+                //moving right
+                value = Mathf.Abs(oldTransform - transform.position.x + 0.9f);
+                m_Anim.SetFloat("Speed", value);
+            }
+            if (oldTransform > transform.position.x)
+            {
+                //moving left
+                value = Mathf.Abs(oldTransform - transform.position.x + 0.9f);
+                m_Anim.SetFloat("Speed", value);
+            }
+            if (oldTransform == transform.position.x)
+            {
+                //standing still
+                value = Mathf.Abs(oldTransform - transform.position.x);
+                m_Anim.SetFloat("Speed", value);
+            }
+
+            //update what the pervious transform was for the next frame
+            oldTransform = transform.position.x;
+        }
+    }
 
     private void FixedUpdate()
         {
- 
-        
        
-            m_Grounded = false;
-            m_Dashing = false;
+        m_Grounded = false;
+        m_Dashing = false;
 
-            // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-            // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-            for (int i = 0; i < colliders.Length; i++)
-            {
-                if (colliders[i].gameObject != gameObject)
-                    m_Grounded = true;
-            }
-            m_Anim.SetBool("Ground", m_Grounded);
+        // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+        // This can be done using layers instead but Sample Assets will not overwrite your project settings.
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i].gameObject != gameObject)
+                m_Grounded = true;
+        }
+        m_Anim.SetBool("Ground", m_Grounded);
 
-            // Set the vertical animation
-            m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
-        Debug.Log(m_Rigidbody2D.velocity.x);
-
-
-       
+        // Set the vertical animation
+        m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
         //check if player has died
         if (health <= 0)
@@ -127,8 +147,12 @@ using UnityEngine;
         if (m_Grounded || m_AirControl)
             {
 
+            if (!replayMode)
+            {
                 // The Speed animator parameter is set to the absolute value of the horizontal input.
+                //Only let this happen if NOT in relay mode
                 m_Anim.SetFloat("Speed", Mathf.Abs(move));
+            }
 
                 // Move the character
                 m_Rigidbody2D.velocity = new Vector2(move*m_MaxSpeed, m_Rigidbody2D.velocity.y);
@@ -280,72 +304,78 @@ using UnityEngine;
         score += numberOfCoins;
     }
 
-        
+    public void SetReplayMode()
+    {
+        //set booleans and reset player stats
+        replayMode = true;
+        validInput = false;
+        health = 5;
+    }
 
-        void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "MovingPlatform") 
         {
-            if (other.gameObject.tag == "MovingPlatform") 
-            {
-                //This will make the player a child of the Obstacle
-                transform.parent = other.gameObject.transform; //Change "myPlayer" to your player
-            }
-
-            if(other.gameObject.tag == "Deathfloor")
-            {
-                transform.position = respawnPoint;
-                health = 5;
-                score = 0;
-            }
-
-            if(other.gameObject.tag == "Campfire")
-            {
-                //if the player went past the checkpoint, this is will be the last posiiton
-                respawnPoint = other.transform.position;
-                respawnPoint = new Vector3(transform.position.x, transform.position.y + 1, 0f);
-            }
-
+            //This will make the player a child of the Obstacle
+            transform.parent = other.gameObject.transform; //Change "myPlayer" to your player
         }
 
-        private void OnTriggerStay2D(Collider2D collision)
+        if(other.gameObject.tag == "Deathfloor")
         {
-            if(collision.gameObject.tag == "Ladder")
-            {
-                //turn on climbing animation
-                m_Anim.SetBool("Climb", true);
-
-            }
+            transform.position = respawnPoint;
+            health = 5;
+            score = 0;
         }
 
-        void OnTriggerExit2D(Collider2D other)
+        if(other.gameObject.tag == "Campfire")
         {
-            //ladder code?
-            m_Anim.SetBool("Climb", false);
-            m_Anim.SetBool("Hurt", false);
+            //if the player went past the checkpoint, this is will be the last posiiton
+            respawnPoint = other.transform.position;
+            respawnPoint = new Vector3(transform.position.x, transform.position.y + 1, 0f);
+        }
+
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag == "Ladder")
+        {
+            //turn on climbing animation
+            m_Anim.SetBool("Climb", true);
+
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        //ladder code?
+        m_Anim.SetBool("Climb", false);
+        m_Anim.SetBool("Hurt", false);
            
-            transform.parent = null;
+        transform.parent = null;
 
-            //if animator is still off on exit....turn it back on
-            if (!m_Anim.enabled)
-            {
-                m_Anim.enabled = true;
-            }
+        //if animator is still off on exit....turn it back on
+        if (!m_Anim.enabled)
+        {
+            m_Anim.enabled = true;
+        }
 
      
-        }
+    }
 
-        public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir)
+    public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir)
+    {
+        float timer = 0;
+
+        while(knockDur > timer)
         {
-            float timer = 0;
-
-            while(knockDur > timer)
-            {
-                timer += Time.deltaTime;
-                m_Rigidbody2D.AddForce(new Vector3(knockbackDir.x * -100, knockbackDir.y * knockbackPwr, transform.position.z));
+            timer += Time.deltaTime;
+            m_Rigidbody2D.AddForce(new Vector3(knockbackDir.x * -100, knockbackDir.y * knockbackPwr, transform.position.z));
                 
-            }
-
-            yield return 0;
         }
+
+        yield return 0;
+    }
 
     public enum DashState
     {

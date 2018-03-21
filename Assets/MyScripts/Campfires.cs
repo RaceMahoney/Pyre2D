@@ -14,8 +14,8 @@ public class Campfires : MonoBehaviour {
     private Rigidbody2D m_Rigidbody2D;
 
     // Use this for initialization
-    void Start () {
-        lit.SetActive(false);
+    public void Start () {
+
 
         if (Thanks.enabled)
         {
@@ -24,6 +24,7 @@ public class Campfires : MonoBehaviour {
 
         m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
         m_Rigidbody2D = m_Character.GetComponent<Rigidbody2D>();
+
 
     }
 
@@ -42,5 +43,6 @@ public class Campfires : MonoBehaviour {
 
         }
     }
+
 
 }

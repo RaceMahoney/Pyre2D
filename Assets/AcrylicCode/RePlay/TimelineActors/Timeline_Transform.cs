@@ -2,6 +2,7 @@
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class Timeline_Transform : MonoBehaviour 
 {
@@ -10,7 +11,7 @@ public class Timeline_Transform : MonoBehaviour
 	public float keyframeInterval = 0.2f;
 	public bool recordPosition = true;
 	public bool recordRotation = true;
-	public bool recordScale = false; //typically not necessary
+	public bool recordScale = false;
 	[Header("Events")]
 	public UnityEvent recordStartEvent = new UnityEvent();
 	public UnityEvent recordEndEvent = new UnityEvent();
@@ -21,6 +22,8 @@ public class Timeline_Transform : MonoBehaviour
 	private KeyframeVector3 positionKey = new KeyframeVector3();
 	private KeyframeQuaternion rotationKey = new KeyframeQuaternion();
 	private KeyframeVector3 scaleKey = new KeyframeVector3();
+
+    private KeyframeFloat attackKey = new KeyframeFloat();
 
 	void Awake()
 	{
@@ -61,6 +64,7 @@ public class Timeline_Transform : MonoBehaviour
 		{
 			this.transform.localScale = scaleKey.SampleCurves( time );
 		}
+
 	}
 
 	void ReceiveRecordingState( bool receivedState )
@@ -123,6 +127,8 @@ public class Timeline_Transform : MonoBehaviour
 				scaleKey.AddKeyframe( transform.localScale, time );
 			}
 
+         
+
 			yield return new WaitForSeconds( keyframeInterval );
 		}
 
@@ -142,6 +148,7 @@ public class Timeline_Transform : MonoBehaviour
 		{
 			scaleKey.SetCurves();
 		}
+        
 
 		yield return null;
 	}

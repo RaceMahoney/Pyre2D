@@ -13,56 +13,55 @@ public class Enemy : MonoBehaviour {
 
     public int currentHealth = 20;
     private PlatformerCharacter2D m_Character;
-    private AutoInput autoInput;
-    private GameObject autoRef;
+    private Vector3 startPos;
 
 
     // Use this for initialization
     void Start () {
-        m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
-        autoInput = GetComponent<AutoInput>();
-       
+       m_Character = GameObject.FindGameObjectWithTag("Player").GetComponent<PlatformerCharacter2D>();
+        startPos = transform.position;
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
-        try
-        {
-            autoRef = GameObject.Find("AUTO_FireHero");
-            if (autoRef.activeInHierarchy)
-            {
-                Time.fixedDeltaTime = autoInput.TIME;
-            }
-        } catch (NullReferenceException e)
-        {
-
-        }
        
      
         //check current health
         if(currentHealth <= 0)
         {
-            gameObject.SetActive(false);
+            //move the enemy someonewhere out of sight
+            Vector3 offScreenVect = new Vector3(0, -50f, 0);
+            gameObject.transform.position = offScreenVect;
+            Waypoints[0].transform.position = offScreenVect;
+            Waypoints[1].transform.position = offScreenVect;
             //TODO death animation
         }
 
 
     }
 
+
     private void FixedUpdate()
     {
-        if (transform.position.x != Waypoints[CurrentPoint].transform.position.x)
+        try
         {
-            transform.position = Vector3.MoveTowards(transform.position, Waypoints[CurrentPoint].transform.position, speed * Time.deltaTime);
-        }
+            if (transform.position.x != Waypoints[CurrentPoint].transform.position.x)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, Waypoints[CurrentPoint].transform.position, speed * Time.deltaTime);
+            }
 
-        if (transform.position.x == Waypoints[CurrentPoint].transform.position.x)
+            if (transform.position.x == Waypoints[CurrentPoint].transform.position.x)
+            {
+                CurrentPoint += 1;
+            }
+            if (CurrentPoint >= Waypoints.Length)
+            {
+                CurrentPoint = 0;
+            }
+        } catch (NullReferenceException e)
         {
-            CurrentPoint += 1;
-        }
-        if (CurrentPoint >= Waypoints.Length)
-        {
-            CurrentPoint = 0;
+            //dont worry theres nothing to see here
         }
 
     }
@@ -80,6 +79,15 @@ public class Enemy : MonoBehaviour {
     {
         currentHealth -= damage;
         //gameObject.gameObject<Animation>.Play("EnemyHurt");
+    }
+
+    public void TurnOn()
+    {
+        if (!gameObject.activeInHierarchy)
+        {
+            currentHealth = 20;
+            transform.position = startPos;
+        } 
     }
 
     
