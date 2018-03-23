@@ -9,7 +9,9 @@ public class SceneReset : MonoBehaviour {
     public GameObject[] bottles;
     public GameObject[] unlit;
     public GameObject[] lit;
+    public GameObject[] cubes;
     public Text Thankyou;
+    public Canvas ReplayCanvas;
 
     public void Reset()
     {
@@ -49,5 +51,13 @@ public class SceneReset : MonoBehaviour {
         {
             Thankyou.enabled = false;
         }
+
+        foreach(GameObject cube in cubes)
+        {
+            cube.SetActive(false);
+        }
+
+        //allow the replay scrubber to be visable 
+        ReplayCanvas.renderMode = RenderMode.ScreenSpaceCamera;
     }
 }

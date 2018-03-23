@@ -348,6 +348,7 @@
     <Compile Include="Assets\AcrylicCode\UtilityScripts\KeyframeFloat.cs" />
     <Compile Include="Assets\AcrylicCode\UtilityScripts\KeyframeQuaternion.cs" />
     <Compile Include="Assets\AcrylicCode\UtilityScripts\KeyframeVector3.cs" />
+    <Compile Include="Assets\CubeTest.cs" />
     <Compile Include="Assets\Demons_Pack\Scripts\Audio\Audio_Manager.cs" />
     <Compile Include="Assets\Demons_Pack\Scripts\Demons\Demon_Controller.cs" />
     <Compile Include="Assets\Demons_Pack\Scripts\Demons\Properties.cs" />

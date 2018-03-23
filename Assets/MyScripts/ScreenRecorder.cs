@@ -13,6 +13,7 @@ using System.Collections.Generic;
 public class ScreenRecorder : MonoBehaviour
 {
     private Checkpoint checkpointTrigger;
+    public GameObject player;
 
     // 4k = 3840 x 2160   1080p = 1920 x 1080
     public int captureWidth = 1920;
@@ -28,32 +29,28 @@ public class ScreenRecorder : MonoBehaviour
     public enum Format { RAW, JPG, PNG, PPM };
     public Format format = Format.PPM;
 
-    // folder to write output (defaults to data path)
-    public string folder;
 
     // private vars for screenshot
     private Rect rect;
     private RenderTexture renderTexture;
     private Texture2D screenShot;
-    private int counter = 0; // image #
 
     // commands
     private bool captureScreenshot = false;
     private bool captureVideo = false;
-
-    public GameObject[] checkpoints;
-    private bool trigger;
 
     private string destinationDrive;
     private string dataPath;
 
     public Texture2D[] textures;
     private int count = 0;
+    private int leadingDigit = 0;
 
     [HideInInspector]
     public List<Vector3> screenPos;
     [HideInInspector]
     public bool isReplay = false;
+    private bool RecordON = true;
 
     private double nextActionTime = 0.0;
     public double peroid = 3;
@@ -63,135 +60,63 @@ public class ScreenRecorder : MonoBehaviour
     void Start()
     {
         checkpointTrigger = GetComponent<Checkpoint>();
-
-    //    //find the correct destination drive
-    //    string[] drives = Directory.GetLogicalDrives();
-    //    foreach (string drive in drives)
-    //    {
-    //        if (drive == @"E:\") //need to replace with whatever the USB drive name is
-    //        {
-    //            destinationDrive = drive;
-    //        }
-    //    }
-
-    //    folder = destinationDrive;
+       
     }
-
-
-    // create a unique filename using a one-up variable
-    private string uniqueFilename(int width, int height)
-    {
-        // if folder not specified by now use a good default
-        if (folder == destinationDrive || folder.Length == 0)
-        {
-            //folder = Application.persistentDataPath;
-            if (Application.isEditor)
-            {
-                // put screenshots in folder above asset path so unity doesn't index the files
-                var stringPath = folder + "/..";
-                folder = Path.GetFullPath(stringPath);
-            }
-            folder += "/screenshots";
-
-            // make sure directoroy exists
-            System.IO.Directory.CreateDirectory(folder);
-
-            // count number of files of specified format in folder
-            string mask = string.Format("checkpoint_{0}x{1}*.{2}", width, height, format.ToString().ToLower());
-            counter = Directory.GetFiles(folder, mask, SearchOption.TopDirectoryOnly).Length;
-        }
-
-        // use width, height, and counter for unique file name
-        var filename = string.Format("{0}/checkpoint_{1}x{2}_{3}.{4}", folder, width, height, counter, format.ToString().ToLower());
-
-        // up counter for next call
-        ++counter;
-
-        // return unique filename
-        return filename;
-    }
-
-
 
 
 
     void Update()
     {
-        if (isReplay)
+        if (Input.GetKeyDown(KeyCode.RightControl))
         {
-            try
+            RecordON = false;
+            Debug.Log("Recording has been turned off");
+
+        }
+
+
+        if (RecordON)
+        {
+            if (isReplay)
             {
-                foreach (Vector3 vect in screenPos)
+                try
                 {
-                    float dist = Vector3.Distance(transform.position, vect);
-                    //transform string to vector
-                    if (dist > 0 && dist < 0.5f)
+                    foreach (Vector3 vect in screenPos)
                     {
-                        captureScreenshot = true;
-                        //made it to this vector
-                        Debug.Log("Made it to the target " + vect);
-                        //remove this vector so it is not triggered again
-                        screenPos.Remove(vect);
+                        float dist = Vector3.Distance(player.transform.position, vect);
+                        //transform string to vector
+                        if (dist > 0 && dist < 0.5f)
+                        {
+                            captureScreenshot = true;
+                            //remove this vector so it is not triggered again
+                            screenPos.Remove(vect);
+                        }
+                        else
+                            captureScreenshot = false;
                     }
-                    else
-                        captureScreenshot = false;
+                }
+                catch (InvalidOperationException e)
+                {
+
                 }
             }
-            catch (InvalidOperationException e)
+            else
             {
-                Debug.Log("List of attack points are now empty");
-            }
-        } else
-        {
-            if (Time.time >= nextActionTime)
-            {
-                nextActionTime += peroid;
-                screenPos.Add(transform.position);
-                captureScreenshot = true;
-            } else
-            {
-                captureScreenshot = false;
+                if (Time.time >= nextActionTime)
+                {
+                    nextActionTime += peroid;
+                    screenPos.Add(player.transform.position);
+                    Debug.Log(player.transform.position + " added to list");
+                    captureScreenshot = true;
+                }
+                else
+                {
+                    captureScreenshot = false;
+                }
             }
         }
-      
-
-
-        //try
-        //{
-        //    foreach (GameObject check in checkpoints)
-        //    {
-        //        //calculate distance of that checkpoint
-        //        float dist = Vector3.Distance(transform.position, check.transform.position);
-
-        //        //if the player gets close enought to the trigger
-        //        //turn it on and get it ready
-        //        if (dist < 15)
-        //        {
-        //            check.SetActive(true);
-        //            //determine if the player has entered the collider
-        //            Checkpoint checkScript = check.GetComponent<Checkpoint>();
-        //            trigger = checkScript.getBool();
-
-        //            if (trigger)
-        //            {
-        //                captureScreenshot = true;
-        //                checkScript.DisableBool();
-        //            }
-        //            else
-        //                captureScreenshot = false;
-        //        }
-        //        else
-        //        {
-        //            check.SetActive(false);
-        //        }
-
-        //    }
-        //}
-        //catch (NullReferenceException e)
-        //{
-        ////gameobject was not there
-        //}
-
+        
+     
 
     }
 
@@ -206,6 +131,8 @@ public class ScreenRecorder : MonoBehaviour
 
         if (captureScreenshot)
         {
+            Debug.Log("Screenshot Captured!");
+
             // hide optional game object if set
             if (hideGameObject != null) hideGameObject.SetActive(false);
 
@@ -219,8 +146,15 @@ public class ScreenRecorder : MonoBehaviour
             byte[] bytes = texture.EncodeToPNG();
 
             // save our test image (could also upload to WWW)
-            File.WriteAllBytes(Application.dataPath + "/screenshots" + dataPath + "/image_" + count + ".png", bytes);
+            File.WriteAllBytes(Application.dataPath + "/screenshots" + dataPath + "/image_" + leadingDigit + count + ".png", bytes);
             count++;
+
+            if(count >= 9)
+            {
+                //reset the counter to keep images in order
+                leadingDigit++;
+                count = 0;
+            }
 
             // Added by Karl. - Tell unity to delete the texture, by default it seems to keep hold of it and memory crashes will occur after too many screenshots.
             DestroyObject(texture);
@@ -230,7 +164,6 @@ public class ScreenRecorder : MonoBehaviour
 
             captureScreenshot = false;
 
-            Debug.Log("Screenshot captured");
         }
 
     }
@@ -244,8 +177,11 @@ public class ScreenRecorder : MonoBehaviour
 
     public void SetAutomatedPath()
     {
+        captureScreenshot = false; //just in case it turns to true while switching states
         dataPath = "/Automated";
         isReplay = true;
+        //turn recording back on
+        RecordON = true;
     }
 
  

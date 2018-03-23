@@ -310,6 +310,12 @@ using UnityEngine;
         replayMode = true;
         validInput = false;
         health = 5;
+
+        //move the player out of the way so that
+        //no accidental trigger happens
+        float half = transform.position.x;
+        half = half / 2;
+        transform.position = new Vector3(half, -50f, 0);
     }
 
     void OnTriggerEnter2D(Collider2D other)

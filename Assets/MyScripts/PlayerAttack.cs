@@ -78,7 +78,7 @@ public class PlayerAttack : MonoBehaviour {
                 if (dist > 0 && dist < 0.5f)
                 {
                     //made it to this vector
-                    Debug.Log("Made it to the target " + vect);
+                   
                     //remove this vector so it is not triggered again
                     vectors.Remove(vect);
                     StartAttack();
@@ -87,7 +87,7 @@ public class PlayerAttack : MonoBehaviour {
             }
         } catch (InvalidOperationException e)
         {
-            Debug.Log("List of attack points are now empty");
+           
         }
         
 
