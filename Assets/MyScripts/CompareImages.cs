@@ -24,12 +24,12 @@ public class CompareImages : MonoBehaviour
 
         foreach (string drive in drives)
         {
-            if (drive == @"E:\") //need to replace with whatever the USB drive name is
+            if (drive == @"F:\") //need to replace with whatever the USB drive name is
             {
                 destinationDrive = drive;
             }
         }
-        destinationDrive += @"screenshots";
+        destinationDrive += @"BugReport.txt";
     }
 
     private void OnApplicationQuit()
@@ -94,13 +94,13 @@ public class CompareImages : MonoBehaviour
                         img2.ColorFuzz = new Percentage(65);
                         using (var imgdiff = new MagickImage())
                         {
-                            double diff = img2.Compare(img1, ErrorMetric.MeanSquared, imgdiff);
+                            double diff = img2.Compare(img1, ErrorMetric.NormalizedCrossCorrelation, imgdiff);
                             imgdiff.Write(@"D:\UnityProjects\Platformer\Pyre2D\screenshots\Differences\image_DIFF_" + i + ".png");
                             Debug.Log("image_DiFF_" + i + ".png value: " + diff);
 
-                            if(diff < 0.05f)
+                            if(diff > 0.51f)
                             {
-                                DisplayReport(diff, i);
+                                DisplayReport(diff, i, automatedImages[i], organicImages[i]);
                             }
                         }
                     }
@@ -116,12 +116,18 @@ public class CompareImages : MonoBehaviour
         }
     }
 
-    void DisplayReport(double diff, int i)
+    void DisplayReport(double diff, int i, string autoImage, string organicImage)
     {
-        //change diff to percent
-        var formatted = diff.ToString("0.##\\%");
-        Debug.Log("POTENTIAL BUG LOCATED AT image_DIFF_" + i + ".png with an error value of: " + formatted);
-        //Debug.Log("Consider examining playback at "); //TODO get second count from replay
+        //change formats
+        var errorPercent = diff.ToString("0.##\\%");
+        var A_image = autoImage.Substring(autoImage.LastIndexOf(@"\") + 1);
+        var O_image = organicImage.Substring(organicImage.LastIndexOf(@"\") + 1);
+
+        StreamWriter writer = new StreamWriter(destinationDrive);
+        writer.WriteLine("POTENTIAL BUG LOCATED AT image_DIFF_" + i + ".png - Error Value of: " + errorPercent);
+        writer.WriteLine("Consider examining playback at " + A_image + " and " + O_image);
+        writer.WriteLine();
+        writer.Close();
     }
 }
 

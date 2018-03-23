@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 using UnityEngine;
 
 public class SceneReset : MonoBehaviour {
@@ -9,9 +11,13 @@ public class SceneReset : MonoBehaviour {
     public GameObject[] bottles;
     public GameObject[] unlit;
     public GameObject[] lit;
-    public GameObject[] cubes;
+    public GameObject[] backgrounds;
+    public TilemapRenderer rend;
     public Text Thankyou;
     public Canvas ReplayCanvas;
+
+    private System.Random rand;
+
 
     public void Reset()
     {
@@ -47,17 +53,25 @@ public class SceneReset : MonoBehaviour {
             }
         }
 
+        foreach (GameObject mountain in backgrounds)
+        {
+            if (mountain.activeInHierarchy)
+            {
+                mountain.SetActive(false);
+            }
+        }
+
         if (Thankyou.IsActive())
         {
             Thankyou.enabled = false;
         }
 
-        foreach(GameObject cube in cubes)
-        {
-            cube.SetActive(false);
-        }
-
-        //allow the replay scrubber to be visable 
         ReplayCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+
+        //set the layer of the render to some random layer each playthrough 
+        rand = new System.Random();
+        int order = rand.Next(-1, -12);
+        rend.sortingOrder = order;
+
     }
 }
