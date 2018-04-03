@@ -1,4 +1,16 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script controls the process of reseting the game 
+* when replay mode was entered
+
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
@@ -12,11 +24,13 @@ public class SceneReset : MonoBehaviour {
     public GameObject[] unlit;
     public GameObject[] lit;
     public GameObject[] backgrounds;
-    public TilemapRenderer rend;
+    //public TilemapRenderer rend;
     public Text Thankyou;
     public Canvas ReplayCanvas;
+    public GameObject DeathScreen;
 
     private System.Random rand;
+    private Vector3 bottleStartPos;
 
 
     public void Reset()
@@ -35,8 +49,10 @@ public class SceneReset : MonoBehaviour {
 
         foreach (GameObject bottle in bottles)
         {
-            if (!bottle.activeInHierarchy)
+            if (!bottle.activeInHierarchy) 
                 bottle.SetActive(true);
+
+
         }
 
         foreach (GameObject UNlitFire in unlit)
@@ -55,11 +71,13 @@ public class SceneReset : MonoBehaviour {
 
         foreach (GameObject mountain in backgrounds)
         {
-            if (mountain.activeInHierarchy)
+            if (!mountain.activeInHierarchy)
             {
-                mountain.SetActive(false);
+                mountain.SetActive(true);
             }
         }
+
+        DeathScreen.SetActive(false);
 
         if (Thankyou.IsActive())
         {
@@ -67,11 +85,6 @@ public class SceneReset : MonoBehaviour {
         }
 
         ReplayCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-
-        //set the layer of the render to some random layer each playthrough 
-        rand = new System.Random();
-        int order = rand.Next(-1, -12);
-        rend.sortingOrder = order;
 
     }
 }

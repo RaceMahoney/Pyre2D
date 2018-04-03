@@ -1,21 +1,29 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script controls the process of saving what is
+* currently on the screen as a PNG file and save it to
+* the specified location
+
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framwork .NET 3.5
+
+*/
+
+using System.Collections;
 using System;
 using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 
-// Screen Recorder will save individual images of active scene in any resolution and of a specific image format
-// including raw, jpg, png, and ppm.  Raw and PPM are the fastest image formats for saving.
-//
-// You can compile these images into a video using ffmpeg:
-// ffmpeg -i screen_3840x2160_%d.ppm -y test.avi
 
 public class ScreenRecorder : MonoBehaviour
 {
     private Checkpoint checkpointTrigger;
     public GameObject player;
+    public PlatformerCharacter2D character;
 
-    // 4k = 3840 x 2160   1080p = 1920 x 1080
     public int captureWidth = 1920;
     public int captureHeight = 1080;
 
@@ -25,41 +33,46 @@ public class ScreenRecorder : MonoBehaviour
     // optimize for many screenshots will not destroy any objects so future screenshots will be fast
     public bool optimizeForManyScreenshots = true;
 
-    // configure with raw, jpg, png, or ppm (simple raw format)
-    public enum Format { RAW, JPG, PNG, PPM };
-    public Format format = Format.PPM;
-
-
     // private vars for screenshot
     private Rect rect;
     private RenderTexture renderTexture;
     private Texture2D screenShot;
 
-    // commands
     private bool captureScreenshot = false;
-    private bool captureVideo = false;
 
     private string destinationDrive;
     private string dataPath;
 
     public Texture2D[] textures;
-    private int count = 0;
-    private int leadingDigit = 0;
+    private int singleDigit = 0;
+    private int hundredsDigit = 0;
+    private int tensDigit = 0;
 
     [HideInInspector]
     public List<Vector3> screenPos;
     [HideInInspector]
     public bool isReplay = false;
-    private bool RecordON = true;
+    private bool RecordON = false;
 
     private double nextActionTime = 0.0;
     public double peroid = 3;
 
-
-
+  
     void Start()
     {
         checkpointTrigger = GetComponent<Checkpoint>();
+        character = GetComponent<PlatformerCharacter2D>();
+        //find the correct destination drive
+        string[] drives = Directory.GetLogicalDrives();
+
+        foreach (string drive in drives)
+        {
+            if (drive == @"F:\") //need to replace with whatever the USB drive name is
+            {
+                destinationDrive = drive;
+            }
+        }
+        destinationDrive += @"Comp\Control\Test#5";
        
     }
 
@@ -67,56 +80,66 @@ public class ScreenRecorder : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightControl))
+        if (Input.GetKeyDown(KeyCode.F8))
         {
             RecordON = false;
             Debug.Log("Recording has been turned off");
 
         }
 
+        //RecordOn - only on when adding transforms to the array
+        //isReplay - only on AFTER recordEvent
+        //need to be looking at transforms in order during replay mode
 
-        if (RecordON)
+        if (RecordON && !isReplay)
         {
-            if (isReplay)
+            if (Time.time >= nextActionTime)
             {
-                try
-                {
-                    foreach (Vector3 vect in screenPos)
-                    {
-                        float dist = Vector3.Distance(player.transform.position, vect);
-                        //transform string to vector
-                        if (dist > 0 && dist < 0.5f)
-                        {
-                            captureScreenshot = true;
-                            //remove this vector so it is not triggered again
-                            screenPos.Remove(vect);
-                        }
-                        else
-                            captureScreenshot = false;
-                    }
-                }
-                catch (InvalidOperationException e)
-                {
-
-                }
+                nextActionTime += peroid;
+                screenPos.Add(player.transform.position);
+                captureScreenshot = true;
             }
             else
             {
-                if (Time.time >= nextActionTime)
-                {
-                    nextActionTime += peroid;
-                    screenPos.Add(player.transform.position);
-                    Debug.Log(player.transform.position + " added to list");
-                    captureScreenshot = true;
-                }
-                else
-                {
-                    captureScreenshot = false;
-                }
+                captureScreenshot = false;
             }
         }
-        
-     
+
+        if(!RecordON && isReplay)
+        {
+            try
+            {
+                //check the first item in the list
+                float dist = Vector3.Distance(player.transform.position, screenPos[0]);
+                //transform string to vector
+                if (dist > 0 && dist < 0.45f)
+                {
+                    captureScreenshot = true;
+                    //move to the next assigned vector
+
+                    //remove the vector from the list so it cannt be used again1
+                    screenPos.RemoveAt(0);
+
+                    try
+                    {
+                        //turn deathScreenblocker off now that we've gotten past that dumb bug
+                        character.dealthScreenBlocker = false;
+
+                    } catch (NullReferenceException ei){
+                        //ehhh
+                    }
+                }
+                else
+                    captureScreenshot = false;
+
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                //Debug.Log("List is empty");
+            }
+        }
+
+
 
     }
 
@@ -146,15 +169,24 @@ public class ScreenRecorder : MonoBehaviour
             byte[] bytes = texture.EncodeToPNG();
 
             // save our test image (could also upload to WWW)
-            File.WriteAllBytes(Application.dataPath + "/screenshots" + dataPath + "/image_" + leadingDigit + count + ".png", bytes);
-            count++;
+            File.WriteAllBytes(destinationDrive +  dataPath + "/image_" + hundredsDigit + tensDigit + singleDigit + ".png", bytes);
+            singleDigit++;
 
-            if(count >= 9)
+            if(tensDigit >= 9 && singleDigit == 9)
+            {
+                //reset the counter
+                hundredsDigit++;
+                tensDigit = 0;
+                singleDigit = 0;
+
+            } else if(singleDigit >= 9)
             {
                 //reset the counter to keep images in order
-                leadingDigit++;
-                count = 0;
+                tensDigit++;
+                singleDigit = 0;
             }
+
+            
 
             // Added by Karl. - Tell unity to delete the texture, by default it seems to keep hold of it and memory crashes will occur after too many screenshots.
             DestroyObject(texture);
@@ -173,6 +205,7 @@ public class ScreenRecorder : MonoBehaviour
     {
         dataPath = "/Organic";
         isReplay = false;
+        RecordON = true;
     }
 
     public void SetAutomatedPath()
@@ -180,10 +213,14 @@ public class ScreenRecorder : MonoBehaviour
         captureScreenshot = false; //just in case it turns to true while switching states
         dataPath = "/Automated";
         isReplay = true;
-        //turn recording back on
-        RecordON = true;
+        RecordON = false;
+
+        //remove the first item of the list on start
+        //Known to cause bug
+        screenPos.RemoveAt(0);
     }
 
  
 }
+
 

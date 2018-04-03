@@ -1,12 +1,23 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script controls the campfire checkpoints 
+* when the player passes by. 
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Campfires : MonoBehaviour {
 
-    public GameObject unlit;
-    public GameObject lit;
+    public GameObject unlit;        //refrence to unlit campfire object
+    public GameObject lit;          //refrence to animated lit campfire object
 
     public Text Thanks;
 
@@ -31,7 +42,8 @@ public class Campfires : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Player")
-        {
+        {   
+            //turn the campfire on and turn off the unlit campfire
             lit.SetActive(true);
             unlit.SetActive(false);
 

@@ -9,8 +9,12 @@ public class SrirachaHealth : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        
-	}
+
+
+
+    }
+
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {

@@ -1,4 +1,14 @@
-﻿using System;
+﻿/** 
+
+* This script moves and animates the enemy object
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,13 +17,13 @@ using UnityStandardAssets._2D;
 [RequireComponent(typeof(PlatformerCharacter2D))]
 public class Enemy : MonoBehaviour {
 
-    public Transform[] Waypoints;
-    public float speed = 2;
+    public Transform[] Waypoints;       //waypoints for the enemy to cycle through
+    public float speed = 2;             //speed of the enemy
     public int CurrentPoint = 0;
 
-    public int currentHealth = 20;
+    public int currentHealth = 20;      //health of the enemy
     private PlatformerCharacter2D m_Character;
-    private Vector3 startPos;
+    private Vector3 startPos;           //starting position of the enemy when the game begins
 
 
     // Use this for initialization
@@ -44,6 +54,7 @@ public class Enemy : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        //move the enemy from the set of waypoints
         try
         {
             if (transform.position.x != Waypoints[CurrentPoint].transform.position.x)
@@ -71,18 +82,18 @@ public class Enemy : MonoBehaviour {
         if (collision.CompareTag("Player"))
         {
             m_Character.Damage(1);
-            //StartCoroutine(m_Character.Knockback(0.02f, 350, transform.position));
         }
     }
 
     public void Damage(int damage)
     {
+        //reduce the health when damange is taken
         currentHealth -= damage;
-        //gameObject.gameObject<Animation>.Play("EnemyHurt");
     }
 
     public void TurnOn()
     {
+        //turn enemy back on when entering replay mode
         if (!gameObject.activeInHierarchy)
         {
             currentHealth = 20;

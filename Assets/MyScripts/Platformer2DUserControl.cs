@@ -1,3 +1,14 @@
+/** 
+
+* This script contols the recives the input from the keyboard
+* that controls the movements of the player
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -30,8 +41,6 @@ public class Platformer2DUserControl : MonoBehaviour
         m_Character = GetComponent<PlatformerCharacter2D>();
         playerAttack = GetComponent<PlayerAttack>();
         
-
-       
     }
 
 
@@ -63,11 +72,12 @@ public class Platformer2DUserControl : MonoBehaviour
 
         if (m_Character.validInput)
         {
-          
+            //call the Move and Dash functions located in PlatformerCharacter2D
             m_Character.Move(h, m_Jump);
             m_Character.Dash(m_Dash);
             
 
+            //reset the bools
             m_Jump = false;
             m_Dash = false;
 

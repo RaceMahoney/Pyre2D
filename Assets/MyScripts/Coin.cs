@@ -1,4 +1,15 @@
-﻿using System.Collections;
+﻿/** 
+
+* Turn off the coin and increase score when player
+* collides with object
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

@@ -146,7 +146,6 @@ public class RePlayTimeline : MonoBehaviour
 	{
 		while( timelineTime <= endTime && timelineTime >= 0 && recording == false )
 		{
-
 			//update time of timeline
 			timelineTime += Time.deltaTime * speed;
 

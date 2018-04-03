@@ -1,4 +1,17 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script takes the images from the specifed 
+* directories, using Magick.NET compares two images
+* of the same index and produces a third image
+* containing the highlighted differences
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ImageMagick;
@@ -29,39 +42,25 @@ public class CompareImages : MonoBehaviour
                 destinationDrive = drive;
             }
         }
-        destinationDrive += @"BugReport.txt";
+        destinationDrive += @"Comp\Control\Test#5";
     }
 
     private void OnApplicationQuit()
     {
+        if(File.Exists(destinationDrive + @"\ValueReport.txt"))
+        {
+            File.Delete(destinationDrive + @"\ValueReport.txt");
+        }
         Compare();
     }
 
     private void Compare()
     {
-        var Organicpath = Application.dataPath + "/screenshots/Organic";
-        var Automatedpath = Application.dataPath + "/screenshots/Automated";
+        var Organicpath = destinationDrive +@"\Organic";
+        var Automatedpath = destinationDrive + @"\Automated";
+ 
 
-        if (Directory.GetFiles(Organicpath).Length != Directory.GetFiles(Automatedpath).Length)
-        {
-            //directoy sizes are not equal
-            //remove from the directory that has too many files
-            if(Directory.GetFiles(Automatedpath).Length > Directory.GetFiles(Organicpath).Length)
-            {
-                //too many files in Automated
-                string[] files = Directory.GetFiles(Automatedpath);
-                string firstFile = files[0];
-                Debug.Log("Deleting file " + firstFile + "from Automated");
-                File.Delete(firstFile);
-            } else {
-
-                // too many files in Organic 
-                string[] files = Directory.GetFiles(Organicpath);
-                string firstFile = files[0];
-                Debug.Log("Deleting file " + firstFile + "from Organic");
-                File.Delete(firstFile);
-            }
-        }
+        Debug.Log(Directory.GetFiles(Organicpath).Length + " in Organic. " + Directory.GetFiles(Automatedpath).Length + "in Automated");
 
         //fill list with all the organic images are
         foreach (string localfile in Directory.GetFiles(Organicpath))
@@ -94,16 +93,13 @@ public class CompareImages : MonoBehaviour
                         img2.ColorFuzz = new Percentage(65);
                         using (var imgdiff = new MagickImage())
                         {
-                            double diff = img2.Compare(img1, ErrorMetric.NormalizedCrossCorrelation, imgdiff);
-                            imgdiff.Write(@"D:\UnityProjects\Platformer\Pyre2D\screenshots\Differences\image_DIFF_" + i + ".png");
-                            Debug.Log("image_DiFF_" + i + ".png value: " + diff);
+                            double diff = img2.Compare(img1, ErrorMetric.StructuralDissimilarity, imgdiff);
+                            imgdiff.Write(destinationDrive + @"\Differences\image_DIFF_" + i + ".png");
+                            Debug.Log("Comapred " + automatedImages[i] + " with " + organicImages[i] + " to make image_Diff_" + i + ".png");
+                            DisplayReport(diff, i, automatedImages[i], organicImages[i]);
 
-                            if(diff > 0.51f)
-                            {
-                                DisplayReport(diff, i, automatedImages[i], organicImages[i]);
-                            }
                         }
-                    }
+                    }                    
                 }
             }
             else
@@ -123,9 +119,10 @@ public class CompareImages : MonoBehaviour
         var A_image = autoImage.Substring(autoImage.LastIndexOf(@"\") + 1);
         var O_image = organicImage.Substring(organicImage.LastIndexOf(@"\") + 1);
 
-        StreamWriter writer = new StreamWriter(destinationDrive);
-        writer.WriteLine("POTENTIAL BUG LOCATED AT image_DIFF_" + i + ".png - Error Value of: " + errorPercent);
-        writer.WriteLine("Consider examining playback at " + A_image + " and " + O_image);
+
+        StreamWriter writer = File.AppendText(destinationDrive + @"\ValueReport.txt");
+        writer.WriteLine("image_DIFF_" + i + ".png - Error Value of: " + errorPercent);
+        writer.WriteLine("Formed from " + A_image + " and " + O_image);
         writer.WriteLine();
         writer.Close();
     }

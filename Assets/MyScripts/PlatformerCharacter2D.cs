@@ -1,3 +1,16 @@
+/** 
+
+* This script controls player movements and other 
+* properties associated with the player object.
+* Actions such as dashing, movement, colliders
+* and score handled here. 
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
 using System;
 using System.Collections;
 using UnityEngine;
@@ -7,7 +20,7 @@ using UnityEngine;
     {
     [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
     [SerializeField] private float m_JumpForce = 12f;                  // Amount of force added when the player jumps.
-    [SerializeField] private float m_DashSpeed = 10f;
+    [SerializeField] private float m_DashSpeed = 10f;                   // Speed of the dash action
     [SerializeField] private bool m_AirControl = true;                 // Whether or not a player can steer while jumping;
     [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
 
@@ -21,37 +34,44 @@ using UnityEngine;
     public Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private float vSpeed;               //Vertical speed
-    private int MAX_HEALTH = 5;
-    private float time = 0;
+    private int MAX_HEALTH = 5;         // Max health that can be set
     public bool replayMode = false;
   
 
     [HideInInspector]
-    public bool validInput = true;
+    public bool validInput = true;      //Determines if input from the keyboard should be used
     [HideInInspector]
-    public int health;
+    public int health;                  //Health of the player
     [HideInInspector]
-    public int score = 0;
+    public int score = 0;               //Current score of the player
 
-    public Vector3 respawnPoint;
-    public GameObject[] enemies;
+    public Vector3 respawnPoint;        //Where the current respawn of the player is
+    public GameObject[] enemies;        //Refrence of all enemy objects
 
     [HideInInspector]
-    public DashState dashState;
+    public DashState dashState;         //Status of Dash
 
     private Platformer2DUserControl controller;
 
-    public Vector2 savedVelocity;
-    public float dashTimer;
+    public Vector2 savedVelocity;       //The saved velocity at the time
+    public float dashTimer;             
     public float maxDash = 8f;
 
-    public int dashStatus = 0; //start at the full dash status
+    public int dashStatus = 0;          //start at the full dash status
     //1 = empty
     //2 half
 
+    [HideInInspector]
+    public Vector3 startTransform;      //Where the player starts THIS life 
     private float oldTransform;
 
-   
+    public GameObject DeathScreen;      //Reference to the dealth screen UI
+    public bool dealthScreenBlocker = false;    //bool to stop bug from occuring in relay ode
+
+    private void Start()
+    {
+        startTransform = transform.position;
+    }
 
     private void Awake()
         {
@@ -68,6 +88,12 @@ using UnityEngine;
         health = MAX_HEALTH;
 
         oldTransform = transform.position.x;
+
+        if(DeathScreen.activeInHierarchy)
+        {
+            DeathScreen.SetActive(false);
+        }
+        
      
         }
 
@@ -77,6 +103,7 @@ using UnityEngine;
         if (replayMode)
         {
             float value;
+            
             //check if moving 
             if (oldTransform > transform.position.x)
             {
@@ -100,6 +127,19 @@ using UnityEngine;
             //update what the pervious transform was for the next frame
             oldTransform = transform.position.x;
         }
+
+        if (!replayMode)
+        {
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                RestartPos();
+            }
+        }
+
+        if(transform.position == startTransform)
+        {
+            DeathScreen.SetActive(false);
+        }
     }
 
     private void FixedUpdate()
@@ -122,20 +162,22 @@ using UnityEngine;
         m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
         //check if player has died
-        if (health <= 0)
+            if (health <= 0)
             {
-            foreach (GameObject demon in enemies)
-            {
-                demon.SetActive(true);
+                foreach (GameObject demon in enemies)
+                {
+                    demon.SetActive(true);
 
-            }
-            //m_Anim.Play("FireHeroDie");
-
-            transform.position = respawnPoint;
-                health = 5;
-                score = 0;
-
-                //TODO: revive dead enemies
+                }
+        
+                    StartCoroutine(DeathTime());
+                    //stop all movement 
+                    m_Rigidbody2D.velocity = Vector3.zero;
+                    m_Rigidbody2D.angularVelocity = 0f;
+                    
+                    health = 5;
+                    score = 0;
+           
             }
         }
 
@@ -185,21 +227,6 @@ using UnityEngine;
                 
             }
 
-            ////if player should dash...
-            //if(dash && !m_Dashing)
-            //{
-            //    m_Dashing = true;
-            //    m_Anim.SetBool("Dash", true);
-
-            //    StartCoroutine(DashTime());
-                
-            //}
-            ////keep dash off if button is not pressed
-            //if (!dash)
-            //{
-            //    m_Dashing = false;
-            //    m_Anim.SetBool("Dash", false);
-            //}
         }
 
     public void Dash(bool isDashing)
@@ -278,7 +305,11 @@ using UnityEngine;
     public void Damage(int dmg)
     {
         //player has been hit by an enemy
-        health -= dmg;
+        //if (replayMode)
+        //{
+            //if in replay mode is on, then set the bugs right
+            health -= dmg;
+        //} 
         gameObject.GetComponent<Animation>().Play("FireHeroHurt");
     }
 
@@ -310,12 +341,16 @@ using UnityEngine;
         replayMode = true;
         validInput = false;
         health = 5;
+        dealthScreenBlocker = true;
 
         //move the player out of the way so that
         //no accidental trigger happens
-        float half = transform.position.x;
-        half = half / 2;
-        transform.position = new Vector3(half, -50f, 0);
+    }
+
+    public void RestartPos()
+    {
+        transform.position = startTransform;
+        DeathScreen.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -328,9 +363,9 @@ using UnityEngine;
 
         if(other.gameObject.tag == "Deathfloor")
         {
-            transform.position = respawnPoint;
-            health = 5;
-            score = 0;
+            
+            health = 0;
+
         }
 
         if(other.gameObject.tag == "Campfire")
@@ -344,17 +379,18 @@ using UnityEngine;
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Ladder")
+
+        if (collision.gameObject.tag == "Ladder")
         {
             //turn on climbing animation
             m_Anim.SetBool("Climb", true);
-
         }
+
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        //ladder code?
+        //ladder code
         m_Anim.SetBool("Climb", false);
         m_Anim.SetBool("Hurt", false);
            
@@ -369,20 +405,7 @@ using UnityEngine;
      
     }
 
-    public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir)
-    {
-        float timer = 0;
-
-        while(knockDur > timer)
-        {
-            timer += Time.deltaTime;
-            m_Rigidbody2D.AddForce(new Vector3(knockbackDir.x * -100, knockbackDir.y * knockbackPwr, transform.position.z));
-                
-        }
-
-        yield return 0;
-    }
-
+    //states of dashing
     public enum DashState
     {
         Ready,
@@ -393,6 +416,7 @@ using UnityEngine;
     public IEnumerator DashTime()
     {
         float timePassed = 0;
+        //loop based off the amount of time passed by
         while(timePassed < 0.2f)
         {
             m_Anim.SetBool("Dash", true);
@@ -403,6 +427,22 @@ using UnityEngine;
         }
         m_Anim.SetBool("Dash", false);
         yield return null;
+    }
+
+    public IEnumerator DeathTime()
+    {
+        //display the death screen for a total of 4 seconds while
+        //moving the player back to checkpoint
+        if (!dealthScreenBlocker)
+        {
+            DeathScreen.SetActive(true);
+            validInput = false;
+            yield return new WaitForSeconds(4);
+            DeathScreen.SetActive(false);
+            transform.position = respawnPoint;
+            validInput = true;
+        }
+       
     }
 
     }

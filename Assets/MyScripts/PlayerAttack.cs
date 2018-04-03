@@ -1,4 +1,16 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script controls the attacking action of the player.
+* Manages the animation time of the attack animation.
+
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityStandardAssets.CrossPlatformInput;
 using System.IO;
@@ -8,33 +20,32 @@ using System;
 public class PlayerAttack : MonoBehaviour {
 
     [HideInInspector]
-    public bool attacking = false;
-    private float attackTimer = 0;
-    private float attackCd = 0.1f;
+    public bool attacking = false;          //determines if the player is attacking
+    private float attackTimer = 0;          //timer
+    private float attackCd = 0.1f;          //length of animation
 
-    public Collider2D attackTrigger;
+    public Collider2D attackTrigger;        //collider trigger
     private Animator m_Anim;
 
-    private string destinationDrive;
     [HideInInspector]
-    public List<Vector3> vectors;
-    private bool isReplay = false;
+    public List<Vector3> vectors;           //vectors to be reached in replay mode
+    private bool isReplay = false;          //determines if in replay mode
 
     private void Awake()
     {
         m_Anim = gameObject.GetComponent<Animator>();
         attackTrigger.enabled = false;
-        destinationDrive = Application.dataPath + "/MyScripts/positions.txt";
     }
 
     private void Update()
     {
+        //Attack key is hit and not already attacking
         if(CrossPlatformInputManager.GetButtonUp("FireAttack") && !attacking)
             StartAttack();
 
+        //check to see when attacking should be turned off
         if (attacking)
         {
-
             if (attackTimer > 0)
             {
                 attackTimer -= Time.deltaTime;
@@ -56,6 +67,7 @@ public class PlayerAttack : MonoBehaviour {
 
     public void StartAttack()
     {
+        //begin process of attacking
         if (!attacking)
         {
             m_Anim.Play("FireHeroAttack");
@@ -76,9 +88,7 @@ public class PlayerAttack : MonoBehaviour {
                 float dist = Vector3.Distance(transform.position, vect);
                 //transform string to vector
                 if (dist > 0 && dist < 0.5f)
-                {
-                    //made it to this vector
-                   
+                {            
                     //remove this vector so it is not triggered again
                     vectors.Remove(vect);
                     StartAttack();
@@ -97,30 +107,5 @@ public class PlayerAttack : MonoBehaviour {
     {
         isReplay = true;
     }
-
-
-    //public void ReadFile()
-    //{
-    //    if (File.Exists(destinationDrive))
-    //    {
-    //        string target;
-    //        //create reader and add each object into list
-    //        StreamReader reader = new StreamReader(destinationDrive);
-    //        for (int i = 0; reader.Peek() > 0; i++)
-    //        {
-    //            target = reader.ReadLine();
-    //            vectors.Add(target);
-    //        }
-    //        reader.Close();
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("Cannot find the file");
-    //    }
-    //    //set isReplay to true to let script know to look for values 
-    //    isReplay = true;
-    //}
-
-    
 
 }

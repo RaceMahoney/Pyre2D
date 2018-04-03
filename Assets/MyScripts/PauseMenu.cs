@@ -1,10 +1,20 @@
-﻿using System.Collections;
+﻿/** 
+
+* This script contols the buttons located within the Pause Screen UI
+
+* @author Race Mahoney
+* @data 04/02/18
+* @framework .NET 3.5
+
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PauseMenu : MonoBehaviour {
 
-    public GameObject PauseUI;
+    public GameObject PauseUI;      //refrence to the PauseUI object
 
     public bool paused = false;
 
